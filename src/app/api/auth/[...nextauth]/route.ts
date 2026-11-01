@@ -49,6 +49,8 @@ const authOptions: NextAuthOptions = {
     },
   },
   secret: process.env.NEXTAUTH_SECRET || "fortune_ysws_super_secret_hackclub_key_2026_priyanshu",
+  // Tells NextAuth to use the Vercel URL instead of localhost in production
+  useSecureCookies: process.env.NODE_ENV === "production",
 };
 
 const handler = NextAuth(authOptions);

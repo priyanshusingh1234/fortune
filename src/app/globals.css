@@ -1,0 +1,117 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 
+  made by a sleepy teen at 3am fueled by boba 🧋
+  if anything breaks blame css, not me
+*/
+
+body {
+  background-color: #f7f1e1;
+  color: #181926;
+  font-family: 'Space Grotesk', sans-serif;
+  overflow-x: hidden;
+}
+
+/* hack club flag ribbon - do not touch or zach will be sad */
+.hackclub-flag {
+  position: fixed;
+  top: 0;
+  left: 20px;
+  z-index: 1000;
+  width: 105px;
+}
+
+.hackclub-flag:hover {
+  transform: translateY(3px);
+}
+
+/* chunky pixel button like an arcade machine */
+.fortune-btn {
+  font-family: 'Silkscreen', monospace;
+  background: #ffffff;
+  color: #181926;
+  border: 3px solid #181926;
+  box-shadow: 4px 4px 0px #181926;
+  border-radius: 12px;
+  padding: 12px 26px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.fortune-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px #181926;
+  background: #fffdf5;
+}
+
+.fortune-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px #181926;
+}
+
+/* shiny yellow button for the rsvp */
+.fortune-btn-gold {
+  background: #ffe066;
+}
+
+.fortune-btn-gold:hover {
+  background: #ffd633;
+}
+
+/* red button */
+.fortune-btn-red {
+  background: #ec3750;
+  color: #ffffff;
+}
+
+/* simple wobbly card like a piece of paper */
+.wobbly-card {
+  background: #ffffff;
+  border: 3px solid #181926;
+  border-radius: 16px;
+  box-shadow: 5px 5px 0px #181926;
+  position: relative;
+}
+
+/* piece of tape stuck on top of paper */
+.tape {
+  width: 85px;
+  height: 22px;
+  background: rgba(255, 235, 170, 0.75);
+  border-left: 2px dashed rgba(0, 0, 0, 0.2);
+  border-right: 2px dashed rgba(0, 0, 0, 0.2);
+  position: absolute;
+  top: -11px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-1.5deg);
+}
+
+.font-pixel {
+  font-family: 'Silkscreen', monospace;
+}
+
+.font-doodle {
+  font-family: 'Patrick Hand', cursive;
+}
+
+/* remove ugly default browser triangle arrow from summary */
+summary::-webkit-details-marker {
+  display: none;
+}
+
+summary {
+  list-style: none;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+
+}

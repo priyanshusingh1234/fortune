@@ -13,6 +13,20 @@ export default function RetroComputerHero() {
   const [bootStep, setBootStep] = useState(0);
   const [activeWindow, setActiveWindow] = useState<"ship" | "shop" | "chat" | "faq" | "roadmap" | null>(null);
 
+  // Scroll down prompt indicator
+  const [scrollPrompt, setScrollPrompt] = useState<string | null>(null);
+
+  const scrollToSection = (id: string, label: string) => {
+    setScrollPrompt(label);
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+    setTimeout(() => {
+      setScrollPrompt(null);
+    }, 3500);
+  };
+
   // Auto-boot to desktop if already signed in
   useEffect(() => {
     if (session?.user && osState === "off") {
@@ -290,13 +304,13 @@ export default function RetroComputerHero() {
 
                     {/* Folder 2: Roadmap */}
                     <div
-                      onClick={() => setActiveWindow("roadmap")}
+                      onClick={() => scrollToSection("quest", "Roadmap")}
                       className="w-20 flex flex-col items-center gap-1 cursor-pointer p-2 rounded hover:bg-white/10 active:scale-95 transition-all text-white font-pixel text-[11px] text-center"
                     >
                       <div className="w-12 h-12 bg-[#38a3a5] rounded-lg border-2 border-white flex items-center justify-center text-2xl shadow-md">
                         📜
                       </div>
-                      <span className="drop-shadow">Roadmap</span>
+                      <span className="drop-shadow">Roadmap ↓</span>
                     </div>
 
                     {/* Folder 3: Shop / Loot */}
@@ -323,13 +337,13 @@ export default function RetroComputerHero() {
 
                     {/* Folder 5: FAQ */}
                     <div
-                      onClick={() => setActiveWindow("faq")}
+                      onClick={() => scrollToSection("faq", "FAQ")}
                       className="w-20 flex flex-col items-center gap-1 cursor-pointer p-2 rounded hover:bg-white/10 active:scale-95 transition-all text-white font-pixel text-[11px] text-center"
                     >
                       <div className="w-12 h-12 bg-[#ffffff] text-[#181926] rounded-lg border-2 border-[#181926] flex items-center justify-center text-2xl shadow-md">
                         ❓
                       </div>
-                      <span className="drop-shadow">FAQ</span>
+                      <span className="drop-shadow">FAQ ↓</span>
                     </div>
 
                   </div>
@@ -521,8 +535,22 @@ export default function RetroComputerHero() {
 
         </div>
 
+        {/* Animated Downward Arrow Indicator when Roadmap or FAQ is clicked */}
+        {scrollPrompt && (
+          <div className="flex flex-col items-center justify-center mt-6 animate-bounce transition-all">
+            <div className="bg-[#ffe066] text-[#181926] px-4 py-2 rounded-full border-3 border-[#181926] shadow-[4px_4px_0px_#181926] font-pixel text-xs sm:text-sm font-bold flex items-center gap-2">
+              <span>📜 Scrolling down to {scrollPrompt}</span>
+              <span className="text-lg">↓</span>
+            </div>
+            <div className="text-4xl text-[#ec3750] font-black -mt-1 select-none">
+              ▼
+            </div>
+          </div>
+        )}
+
       </div>
 
     </section>
   );
 }
+

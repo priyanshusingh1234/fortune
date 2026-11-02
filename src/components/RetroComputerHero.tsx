@@ -37,6 +37,13 @@ export default function RetroComputerHero() {
   // Turn On / Boot Sequence
   const handlePowerOn = () => {
     if (osState !== "off") return;
+
+    // Requirement: Must be signed in to open the computer
+    if (!session || !session.user) {
+      signIn("hackclub");
+      return;
+    }
+
     setOsState("booting");
     setBootStep(1);
 
@@ -141,14 +148,24 @@ export default function RetroComputerHero() {
                   </p>
 
                   <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
-                    {/* Big Turn On Button */}
-                    <button
-                      onClick={handlePowerOn}
-                      className="bg-[#10b981] hover:bg-[#0da472] text-[#181926] font-pixel text-sm sm:text-base font-bold py-3.5 px-7 rounded-xl border-2 border-white shadow-[4px_4px_0px_#000] transition-all hover:scale-105 active:scale-95 flex items-center gap-2 cursor-pointer"
-                    >
-                      <span>⚡</span>
-                      <span>TURN ON COMPUTER</span>
-                    </button>
+                    {/* Big Turn On / Sign In Button */}
+                    {session?.user ? (
+                      <button
+                        onClick={handlePowerOn}
+                        className="bg-[#10b981] hover:bg-[#0da472] text-[#181926] font-pixel text-sm sm:text-base font-bold py-3.5 px-7 rounded-xl border-2 border-white shadow-[4px_4px_0px_#000] transition-all hover:scale-105 active:scale-95 flex items-center gap-2 cursor-pointer"
+                      >
+                        <span>⚡</span>
+                        <span>TURN ON COMPUTER</span>
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => signIn("hackclub")}
+                        className="bg-[#ec3750] hover:bg-[#d6253e] text-white font-pixel text-sm sm:text-base font-bold py-3.5 px-7 rounded-xl border-2 border-white shadow-[4px_4px_0px_#000] transition-all hover:scale-105 active:scale-95 flex items-center gap-2 cursor-pointer"
+                      >
+                        <span>🔒</span>
+                        <span>SIGN IN TO TURN ON</span>
+                      </button>
+                    )}
 
                     {/* RSVP Button */}
                     <a

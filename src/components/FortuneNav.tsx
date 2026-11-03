@@ -2,10 +2,19 @@
 
 import React from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { signIn, signOut, useSession } from "next-auth/react";
+import { isUserAdmin } from "@/lib/admin";
 
 export default function FortuneNav() {
   const { data: session, status } = useSession();
+  const pathname = usePathname();
+  const isAdmin = isUserAdmin(session?.user);
+
+  // When logged in on homepage, hide top navbar to let retro computer fill the entire screen
+  if (session?.user && pathname === "/") {
+    return null;
+  }
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-40 bg-[#f7f1e1]/90 backdrop-blur-md border-b-2 border-[#181926]/10 px-4 sm:px-8 py-3">
@@ -37,12 +46,22 @@ export default function FortuneNav() {
               Checking...
             </div>
           ) : session?.user ? (
-            <Link
-              href="/dashboard"
-              className="bg-[#ffe066] hover:bg-[#ffd533] text-[#181926] px-3.5 py-1.5 rounded-md border-2 border-[#181926] shadow-[2px_2px_0px_#181926] font-bold transition-transform hover:-translate-y-0.5"
-            >
-              ⚡ Dashboard
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link
+                href="/dashboard"
+                className="bg-[#ffe066] hover:bg-[#ffd533] text-[#181926] px-3.5 py-1.5 rounded-md border-2 border-[#181926] shadow-[2px_2px_0px_#181926] font-bold transition-transform hover:-translate-y-0.5"
+              >
+                ⚡ Dashboard
+              </Link>
+              {isAdmin && (
+                <Link
+                  href="/admin"
+                  className="bg-[#181926] text-white hover:bg-[#333] px-2.5 py-1.5 rounded-md border-2 border-[#181926] font-bold text-[11px] shadow-[2px_2px_0px_#ec3750]"
+                >
+                  🛡️ Admin
+                </Link>
+              )}
+            </div>
           ) : (
             <button
               onClick={() => signIn("hackclub")}

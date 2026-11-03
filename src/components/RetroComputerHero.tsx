@@ -4,16 +4,29 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { signIn, signOut, useSession } from "next-auth/react";
 import confetti from "canvas-confetti";
+import { isUserAdmin } from "@/lib/admin";
+import { FORTUNE_FAQS } from "@/components/FortuneFaq";
+import StartupCalculator from "@/components/StartupCalculator";
 
-export default function RetroComputerHero() {
+interface RetroComputerHeroProps {
+  fullscreen?: boolean;
+}
+
+export default function RetroComputerHero({ fullscreen = false }: RetroComputerHeroProps) {
   const { data: session } = useSession();
+  const isAdmin = isUserAdmin(session?.user);
 
   // OS State: "off" | "booting" | "desktop"
   const [osState, setOsState] = useState<"off" | "booting" | "desktop">("off");
   const [bootStep, setBootStep] = useState(0);
   const [activeWindow, setActiveWindow] = useState<"ship" | "shop" | "chat" | "faq" | "roadmap" | null>(null);
+  const [startMenuOpen, setStartMenuOpen] = useState(false);
 
-  // Scroll down prompt indicator
+  // FAQ search & expanded state
+  const [faqSearch, setFaqSearch] = useState("");
+  const [expandedFaqIndex, setExpandedFaqIndex] = useState<number | null>(0);
+
+  // Scroll down prompt indicator (for non-fullscreen mode)
   const [scrollPrompt, setScrollPrompt] = useState<string | null>(null);
 
   const scrollToSection = (id: string, label: string) => {
@@ -34,11 +47,73 @@ export default function RetroComputerHero() {
     }
   }, [session, osState]);
 
+  // Real Submissions State (No Fake Data)
+  interface HeroSubmission {
+    id: string;
+    title: string;
+    hackatime_project: string;
+    verified_hours: number;
+    status: "pending_review" | "approved" | "changes_requested" | "rejected";
+    created_at: string;
+  }
+
+  const [userSubmissions, setUserSubmissions] = useState<HeroSubmission[]>([]);
+
+  useEffect(() => {
+    if (!session?.user) {
+      setUserSubmissions([]);
+      return;
+    }
+
+    const name = session.user.name || "";
+    const slackId = (session.user as any)?.slack_id || (session.user as any)?.id || "";
+    const email = session.user.email || "";
+
+    fetch(`/api/submissions?user=${encodeURIComponent(name)}&slackId=${encodeURIComponent(slackId)}&email=${encodeURIComponent(email)}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.submissions && Array.isArray(data.submissions)) {
+          setUserSubmissions(data.submissions);
+        }
+      })
+      .catch((err) => console.warn("Notice fetching hero submissions:", err));
+  }, [session]);
+
+  const approvedSub = userSubmissions.find((s) => s.status === "approved");
+  const latestSub = userSubmissions.length > 0 ? userSubmissions[0] : null;
+  const isApproved = !!approvedSub;
+  const hasShipped = !!latestSub;
+
+  const formatShippedTime = (dateStr?: string) => {
+    if (!dateStr) return "Not Shipped Yet";
+    try {
+      const date = new Date(dateStr);
+      const now = new Date();
+      const diffMs = now.getTime() - date.getTime();
+      const diffMins = Math.floor(diffMs / (1000 * 60));
+      const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+      if (diffMins < 60) {
+        return diffMins <= 1 ? "Just now" : `${diffMins}m ago`;
+      } else if (diffHours < 24) {
+        return `${diffHours}h ago`;
+      } else if (diffDays === 1) {
+        return "Yesterday";
+      } else if (diffDays < 7) {
+        return `${diffDays}d ago`;
+      } else {
+        return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      }
+    } catch {
+      return "Recently Shipped";
+    }
+  };
+
   // Turn On / Boot Sequence
   const handlePowerOn = () => {
     if (osState !== "off") return;
 
-    // Requirement: Must be signed in to open the computer
     if (!session || !session.user) {
       signIn("hackclub");
       return;
@@ -63,107 +138,166 @@ export default function RetroComputerHero() {
   const handlePowerOff = () => {
     setOsState("off");
     setActiveWindow(null);
+    setStartMenuOpen(false);
   };
 
-  return (
-    <section className="relative pt-24 pb-16 px-4 sm:px-6 max-w-6xl mx-auto">
-      
-      {/* Top Credits Ribbon */}
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-6 font-pixel text-xs">
-        <div className="flex items-center gap-2">
-          <span className="bg-[#ec3750] text-white px-3 py-1 rounded-full border-2 border-[#181926] shadow-[2px_2px_0px_#181926] font-bold">
-            ★ HACK CLUB YSWS
-          </span>
-          <span className="bg-white px-3 py-1 rounded-full border-2 border-[#181926] shadow-[2px_2px_0px_#181926] text-[#b45309] font-bold">
-            👑 Org: @Noben_Nobi
-          </span>
-          <span className="bg-white px-3 py-1 rounded-full border-2 border-[#181926] shadow-[2px_2px_0px_#181926] text-[#15803d] font-bold">
-            🤝 Co-Org: @itsnotketan
-          </span>
-        </div>
+  const filteredFaqs = FORTUNE_FAQS.filter((f) => {
+    if (!faqSearch.trim()) return true;
+    const query = faqSearch.toLowerCase();
+    return f.q.toLowerCase().includes(query) || f.a.toLowerCase().includes(query);
+  });
 
-        <div className="bg-white px-3 py-1 rounded-full border-2 border-[#181926] shadow-[2px_2px_0px_#181926] text-[#ec3750] font-bold">
-          🛠️ Lead Dev: Priyanshu Singh
+  return (
+    <section className={
+      fullscreen
+        ? "w-full h-full flex flex-col p-1 sm:p-2 bg-[#1b1c24] overflow-hidden"
+        : "relative pt-24 pb-16 px-4 sm:px-6 max-w-6xl mx-auto"
+    }>
+      
+      {/* Top Credits Ribbon (Only shown on public landing page when NOT in fullscreen PC mode) */}
+      {!fullscreen && (
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-6 font-pixel text-xs">
+          <div className="flex items-center gap-2">
+            <span className="bg-[#ec3750] text-white px-3 py-1 rounded-full border-2 border-[#181926] shadow-[2px_2px_0px_#181926] font-bold">
+              ★ HACK CLUB YSWS
+            </span>
+            <span className="bg-white px-3 py-1 rounded-full border-2 border-[#181926] shadow-[2px_2px_0px_#181926] text-[#b45309] font-bold">
+              👑 Org: @Noben_Nobi
+            </span>
+            <span className="bg-white px-3 py-1 rounded-full border-2 border-[#181926] shadow-[2px_2px_0px_#181926] text-[#15803d] font-bold">
+              🤝 Co-Org: @itsnotketan
+            </span>
+          </div>
+
+          <div className="bg-white px-3 py-1 rounded-full border-2 border-[#181926] shadow-[2px_2px_0px_#181926] text-[#ec3750] font-bold">
+            🛠️ Lead Dev: Priyanshu Singh
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Main Retro Monitor Chassis Container */}
-      <div className={`transition-all duration-700 mx-auto ${
-        osState === "desktop" ? "scale-[1.02] max-w-5xl" : "max-w-4xl"
-      }`}>
+      <div className={
+        fullscreen
+          ? "flex-1 min-h-0 flex flex-col w-full"
+          : `transition-all duration-700 mx-auto ${osState === "desktop" ? "scale-[1.02] max-w-5xl" : "max-w-4xl"}`
+      }>
         
-        {/* Retro Macintosh / CRT Bezel (Warm Beige #e6dec3) */}
-        <div className="bg-[#e8dec0] p-4 sm:p-7 rounded-[28px] border-4 border-[#181926] shadow-[10px_10px_0px_#181926] relative">
+        {/* Retro Macintosh / CRT Bezel (Warm Beige #e8dec0) */}
+        <div className={
+          fullscreen
+            ? "bg-[#e8dec0] p-2 sm:p-3 rounded-xl sm:rounded-2xl border-4 border-[#181926] shadow-2xl relative flex-1 min-h-0 flex flex-col overflow-hidden"
+            : "bg-[#e8dec0] p-4 sm:p-7 rounded-[28px] border-4 border-[#181926] shadow-[10px_10px_0px_#181926] relative"
+        }>
           
-          {/* Top Monitor Details */}
-          <div className="flex items-center justify-between pb-3 px-2 border-b-2 border-[#181926]/10 mb-3 font-pixel text-[11px] text-[#5c503b]">
+          {/* Top Monitor Bezel Bar */}
+          <div className="flex items-center justify-between pb-2 px-2 border-b-2 border-[#181926]/10 mb-2 font-pixel text-[11px] text-[#5c503b] shrink-0">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-[#181926]/40 inline-block"></span>
-              <span className="font-bold tracking-widest">FORTUNE 1994 CRT WORKSTATION</span>
+              <span className="font-bold tracking-widest hidden sm:inline">FORTUNE 1994 CRT WORKSTATION</span>
+              <span className="font-bold tracking-widest sm:hidden">FORTUNE CRT</span>
             </div>
-            <div className="flex items-center gap-3">
-              <span className="hidden sm:inline">640x480 COLOR MATRIX</span>
-              {/* Power LED */}
+            
+            <div className="flex items-center gap-2 sm:gap-3">
+              {isAdmin && (
+                <Link
+                  href="/admin"
+                  className="bg-[#181926] text-white px-2 py-0.5 rounded border border-[#ec3750] text-[10px] font-bold hover:bg-[#333]"
+                  title="Open Admin Panel (Restricted to U0BTDMCJ6P7)"
+                >
+                  🛡️ Admin
+                </Link>
+              )}
+              {session?.user && (
+                <Link
+                  href="/dashboard"
+                  className="bg-[#ffe066] text-[#181926] px-2 py-0.5 rounded border border-[#181926] text-[10px] font-bold hover:bg-[#ffd533]"
+                  title="Open Founder Dashboard"
+                >
+                  ⚡ Dashboard
+                </Link>
+              )}
+
+              <span className="hidden md:inline">640x480 MATRIX</span>
+              
+              {/* Power LED & Logout */}
               <div className="flex items-center gap-1.5">
                 <span className={`w-2.5 h-2.5 rounded-full transition-all ${
                   osState !== "off"
                     ? "bg-[#10b981] shadow-[0_0_8px_#10b981]"
                     : "bg-[#ec3750]/40"
                 }`}></span>
-                <span className="text-[10px] font-bold">
+                <span className="text-[10px] font-bold hidden sm:inline">
                   {osState !== "off" ? "PWR ON" : "STANDBY"}
                 </span>
+
+                {session?.user && (
+                  <button
+                    onClick={() => signOut()}
+                    className="text-[#ec3750] hover:underline font-bold text-[10px] ml-1"
+                    title="Sign out of Fortune"
+                  >
+                    [LOG OUT]
+                  </button>
+                )}
               </div>
             </div>
           </div>
 
-          {/* CRT SCREEN INNER FRAME (Dark border around screen glass) */}
-          <div className="bg-[#181926] p-2.5 sm:p-3.5 rounded-[18px] border-3 border-[#181926] shadow-inner relative overflow-hidden">
+          {/* CRT Monitor Screen Surface */}
+          <div className={
+            fullscreen
+              ? "flex-1 min-h-0 flex flex-col relative"
+              : "relative rounded-[16px] overflow-hidden border-4 border-[#2b2416] bg-[#0c0d14] shadow-inner"
+          }>
             
-            {/* 1. STATE: OFF (The Monitor Screen Before Booting) */}
+            {/* Scanline CRT Retro Visual Effects */}
+            <div className="scanlines pointer-events-none z-10"></div>
+            <div className="crt-flicker pointer-events-none z-10"></div>
+
+            {/* 1. STATE: POWERED OFF / STANDBY SCREEN */}
             {osState === "off" && (
-              <div className="min-h-[460px] sm:min-h-[500px] bg-[#1a1c26] rounded-[12px] flex flex-col justify-between p-6 sm:p-10 relative overflow-hidden text-center text-white select-none">
+              <div className="min-h-[460px] sm:min-h-[500px] bg-[#14151f] rounded-[12px] flex flex-col items-center justify-center p-6 text-center text-white relative">
                 
-                {/* CRT Scanline overlay effect */}
-                <div className="absolute inset-0 bg-[radial-gradient(#252a3d_1px,transparent_1px)] [background-size:16px_16px] opacity-40 pointer-events-none"></div>
+                {/* Background CRT phosphor grid texture */}
+                <div className="absolute inset-0 bg-[radial-gradient(#1f2238_1px,transparent_1px)] [background-size:16px_16px] opacity-40"></div>
 
-                {/* Top prompt */}
-                <div className="flex items-center justify-between font-pixel text-xs text-[#10b981]">
-                  <span>BIOS v3.11 READY</span>
-                  <span className="animate-pulse">● CLICK POWER BUTTON BELOW</span>
-                </div>
-
-                {/* Center Content: Title, RSVP & Turn On */}
-                <div className="my-auto py-6 space-y-6 max-w-lg mx-auto">
-                  <div className="inline-block bg-[#ec3750] text-white px-3 py-1 font-pixel text-xs rounded border border-white/20 shadow-md">
-                    ~ YOU SHIP, WE SHIP FOR TEEN FOUNDERS ~
+                <div className="relative z-10 max-w-lg space-y-6">
+                  
+                  {/* Fortune Logo Icon */}
+                  <div className="inline-block relative">
+                    <span className="text-6xl sm:text-7xl block animate-pulse">🥠</span>
+                    <span className="absolute -top-2 -right-2 bg-[#ec3750] text-white text-[10px] font-pixel px-2 py-0.5 rounded-full border border-white">
+                      YSWS
+                    </span>
                   </div>
 
-                  <h1 className="text-5xl sm:text-7xl font-black font-sans tracking-tight text-white drop-shadow-md">
-                    Fortune<span className="text-[#ffe066]">.</span>
-                  </h1>
+                  {/* Headline */}
+                  <div className="space-y-2">
+                    <h1 className="font-pixel text-2xl sm:text-3xl text-[#ffe066] drop-shadow-md tracking-wider">
+                      Fortune 1.0
+                    </h1>
+                    <p className="font-doodle text-sm sm:text-base text-gray-300">
+                      Code software • Claim $100 seed grant • Build a real business
+                    </p>
+                  </div>
 
-                  <p className="font-doodle text-xl sm:text-2xl text-[#ffe066] font-bold">
-                    code software • get seed micro-funded • build a startup
-                  </p>
-
-                  <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
-                    {/* Big Turn On / Sign In Button */}
+                  {/* Boot / Login Button */}
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
                     {session?.user ? (
                       <button
                         onClick={handlePowerOn}
-                        className="bg-[#10b981] hover:bg-[#0da472] text-[#181926] font-pixel text-sm sm:text-base font-bold py-3.5 px-7 rounded-xl border-2 border-white shadow-[4px_4px_0px_#000] transition-all hover:scale-105 active:scale-95 flex items-center gap-2 cursor-pointer"
+                        className="bg-[#10b981] hover:bg-[#059669] text-white font-pixel text-sm sm:text-base font-bold py-3.5 px-6 rounded-xl border-2 border-white shadow-[4px_4px_0px_#000] transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
                       >
                         <span>⚡</span>
-                        <span>TURN ON COMPUTER</span>
+                        <span>Launch Workstation (Boot OS)</span>
                       </button>
                     ) : (
                       <button
                         onClick={() => signIn("hackclub")}
-                        className="bg-[#ec3750] hover:bg-[#d6253e] text-white font-pixel text-sm sm:text-base font-bold py-3.5 px-7 rounded-xl border-2 border-white shadow-[4px_4px_0px_#000] transition-all hover:scale-105 active:scale-95 flex items-center gap-2 cursor-pointer"
+                        className="bg-[#ec3750] hover:bg-[#d6253e] text-white font-pixel text-sm sm:text-base font-bold py-3.5 px-6 rounded-xl border-2 border-white shadow-[4px_4px_0px_#000] transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
                       >
-                        <span>🔒</span>
-                        <span>SIGN IN TO TURN ON</span>
+                        <span>🚀</span>
+                        <span>Connect Slack to Boot</span>
                       </button>
                     )}
 
@@ -181,10 +315,10 @@ export default function RetroComputerHero() {
                 </div>
 
                 {/* Bottom specs bar */}
-                <div className="font-pixel text-[11px] text-gray-400 flex flex-wrap justify-center gap-4">
+                <div className="font-pixel text-[11px] text-gray-400 flex flex-wrap justify-center gap-4 mt-8">
                   <span>Track coding on Hackatime</span>
                   <span>•</span>
-                  <span>$50-$150 HCB Grants</span>
+                  <span>$100 HCB Grants</span>
                   <span>•</span>
                   <span>0% Equity</span>
                 </div>
@@ -195,7 +329,7 @@ export default function RetroComputerHero() {
             {osState === "booting" && (
               <div className="min-h-[460px] sm:min-h-[500px] bg-[#11121a] rounded-[12px] flex flex-col items-center justify-center p-8 text-center text-white relative">
                 
-                {/* Glowing Mac/Windows Style Boot Screen */}
+                {/* Glowing Boot Screen */}
                 <div className="space-y-6 max-w-sm">
                   <div className="text-6xl animate-bounce">🥠</div>
                   
@@ -230,90 +364,142 @@ export default function RetroComputerHero() {
 
             {/* 3. STATE: THE RETRO COMPUTER DESKTOP WORKSPACE */}
             {osState === "desktop" && (
-              <div className="min-h-[520px] sm:min-h-[580px] bg-[#22577a] rounded-[12px] flex flex-col justify-between relative overflow-hidden select-none border-2 border-[#181926]">
+              <div className={
+                fullscreen
+                  ? "flex-1 min-h-0 bg-[#22577a] rounded-[10px] sm:rounded-[12px] flex flex-col justify-between relative overflow-hidden select-none border-2 border-[#181926]"
+                  : "min-h-[520px] sm:min-h-[580px] bg-[#22577a] rounded-[12px] flex flex-col justify-between relative overflow-hidden select-none border-2 border-[#181926]"
+              }>
                 
                 {/* Desktop Wallpaper Texture */}
                 <div className="absolute inset-0 bg-[radial-gradient(#38a3a5_1px,transparent_1px)] [background-size:24px_24px] opacity-25 pointer-events-none"></div>
 
-                {/* TOP DESKTOP WORKSPACE */}
-                <div className="p-4 sm:p-6 grid grid-cols-1 md:grid-cols-12 gap-6 relative z-10">
+                {/* DESKTOP WORKSPACE GRID */}
+                <div className="p-4 sm:p-6 grid grid-cols-1 md:grid-cols-12 gap-4 relative z-20">
                   
-                  {/* TOP-LEFT: THE CASH MONEY PROFILE NOTE */}
+                  {/* TOP-LEFT: CRT FOUNDER CASH VOUCHER (REAL USER DATA) */}
                   <div className="md:col-span-5">
-                    <div className="bg-[#e8f5e9] border-3 border-[#2e7d32] p-4 sm:p-5 rounded-xl shadow-[5px_5px_0px_#181926] relative rotate-[-1deg] hover:rotate-0 transition-transform">
-                      {/* Cash note stamp watermark */}
-                      <div className="absolute top-2 right-3 font-pixel text-[10px] text-[#2e7d32]/60 border border-[#2e7d32]/40 px-1 rounded">
-                        FORTUNE $100
+                    <div className="bg-[#f0fdf4] border-2 border-[#181926] rounded-xl p-3 sm:p-4 shadow-[4px_4px_0px_#181926] text-[#181926] font-pixel text-xs space-y-3">
+                      
+                      {/* Header */}
+                      <div className="flex items-center justify-between border-b-2 border-dashed border-[#181926]/30 pb-2">
+                        <div className="flex items-center gap-2">
+                          {session?.user?.image ? (
+                            <img
+                              src={session.user.image}
+                              alt="Avatar"
+                              className="w-8 h-8 rounded-full border border-[#181926] object-cover"
+                            />
+                          ) : (
+                            <div className="w-8 h-8 rounded-full bg-[#ec3750] text-white flex items-center justify-center font-bold text-xs border border-[#181926]">
+                              h
+                            </div>
+                          )}
+                          <div>
+                            <div className="text-[10px] text-gray-500 uppercase">FOUNDER CASH VOUCHER</div>
+                            <div className="font-bold text-sm text-[#181926] truncate max-w-[160px]">
+                              @{session?.user?.name || "clubber"}
+                            </div>
+                          </div>
+                        </div>
+                        <span className="bg-[#dcfce7] text-[#15803d] border border-[#15803d]/40 px-2 py-0.5 rounded text-[10px] font-bold">
+                          FORTUNE $100
+                        </span>
                       </div>
 
-                      <div className="flex items-center gap-3 pb-3 border-b-2 border-dashed border-[#2e7d32]/30 mb-3">
-                        {session?.user?.image ? (
-                          <img
-                            src={session.user.image}
-                            alt="Avatar"
-                            className="w-12 h-12 rounded-full border-2 border-[#2e7d32] object-cover"
-                          />
+                      {/* Dynamic Real Status Badge */}
+                      <div className="text-[10px] flex items-center justify-between text-gray-600 bg-white/70 p-1.5 rounded border border-[#181926]/15">
+                        <span>STATUS:</span>
+                        {isApproved ? (
+                          <span className="text-[#10b981] font-bold flex items-center gap-1">
+                            <span>✓</span> APPROVED &amp; FUNDED
+                          </span>
+                        ) : hasShipped ? (
+                          <span className="text-[#b45309] font-bold flex items-center gap-1">
+                            <span>⏳</span> AWAITING REVIEW
+                          </span>
                         ) : (
-                          <div className="w-12 h-12 rounded-full bg-[#2e7d32] text-white flex items-center justify-center font-pixel text-lg font-bold border-2 border-[#1b5e20]">
-                            💵
-                          </div>
+                          <span className="text-gray-500 font-bold">
+                            READY TO SHIP PROJECT
+                          </span>
                         )}
-                        <div>
-                          <div className="font-pixel text-[10px] text-[#2e7d32] uppercase font-bold tracking-wider">
-                            FOUNDER CASH VOUCHER
-                          </div>
-                          <div className="font-sans font-black text-lg text-[#1b5e20] leading-tight">
-                            @{session?.user?.name || "Anonymous Founder"}
-                          </div>
-                          <div className="font-pixel text-[10px] text-gray-600">
-                            Status: <strong className="text-[#2e7d32]">Verified Teen Shipper</strong>
-                          </div>
-                        </div>
                       </div>
 
-                      {/* Cash note stats */}
-                      <div className="grid grid-cols-2 gap-2 font-pixel text-xs text-[#1b5e20]">
-                        <div className="bg-white/80 p-2 rounded border border-[#2e7d32]/30 text-center">
-                          <span className="text-[10px] text-gray-500 block">MICRO-GRANT</span>
-                          <strong className="text-sm font-sans">$50 – $150</strong>
+                      {/* Main Data Boxes: Granted Money vs Shipped Time */}
+                      <div className="grid grid-cols-2 gap-2 text-center">
+                        
+                        {/* Box 1: Granted Money (if approved) OR Shipped Time (if awaiting review/unapproved) */}
+                        <div className="bg-white p-2 rounded-lg border border-[#181926]/30 shadow-sm flex flex-col justify-center min-h-[58px]">
+                          {isApproved ? (
+                            <>
+                              <div className="text-[9px] text-[#10b981] font-bold uppercase">GRANTED MONEY</div>
+                              <div className="text-base sm:text-lg font-bold text-[#10b981] font-mono leading-tight">
+                                $100.00
+                              </div>
+                              <div className="text-[8px] text-gray-400 font-mono">HCB DISBURSED</div>
+                            </>
+                          ) : hasShipped ? (
+                            <>
+                              <div className="text-[9px] text-gray-500 uppercase">SHIPPED TIME</div>
+                              <div className="text-xs sm:text-sm font-bold text-[#181926] font-mono leading-tight truncate">
+                                {formatShippedTime(latestSub?.created_at)}
+                              </div>
+                              <div className="text-[8px] text-[#b45309] font-mono truncate" title={latestSub?.title}>
+                                {latestSub?.verified_hours ? `${latestSub.verified_hours}h coded` : "In Review"}
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              <div className="text-[9px] text-gray-500 uppercase">SHIPPED TIME</div>
+                              <div className="text-xs font-bold text-gray-400 font-mono leading-tight">
+                                NOT SHIPPED
+                              </div>
+                              <div className="text-[8px] text-[#ec3750] font-mono">SHIP BELOW ↓</div>
+                            </>
+                          )}
                         </div>
-                        <div className="bg-white/80 p-2 rounded border border-[#2e7d32]/30 text-center">
-                          <span className="text-[10px] text-gray-500 block">EQUITY TAKEN</span>
-                          <strong className="text-sm font-sans text-[#ec3750]">0% (None)</strong>
+
+                        {/* Box 2: Equity Taken */}
+                        <div className="bg-white p-2 rounded-lg border border-[#181926]/30 shadow-sm flex flex-col justify-center min-h-[58px]">
+                          <div className="text-[9px] text-gray-500 uppercase">EQUITY TAKEN</div>
+                          <div className="text-base sm:text-lg font-bold text-[#ec3750] font-mono leading-tight">
+                            0% (NONE)
+                          </div>
+                          <div className="text-[8px] text-gray-400 font-mono">100% YOURS</div>
                         </div>
+
                       </div>
 
-                      {/* Cash Note Footer Auth Prompt */}
-                      <div className="mt-3 pt-2 border-t border-dashed border-[#2e7d32]/30 flex items-center justify-between text-[11px] font-pixel">
-                        <span className="text-[#2e7d32]">Hack Club Bank (HCB)</span>
-                        {session?.user ? (
+                      {/* Footer Actions */}
+                      <div className="flex items-center justify-between pt-1 border-t border-dashed border-[#181926]/20 text-[10px]">
+                        <span className="text-gray-500">HACK CLUB BANK (HCB)</span>
+                        <div className="flex items-center gap-2">
+                          <Link
+                            href="/dashboard"
+                            className="text-[#10b981] font-bold hover:underline"
+                          >
+                            [VIEW SHIP ↗]
+                          </Link>
                           <button
                             onClick={() => signOut()}
-                            className="text-[#c62828] hover:underline"
+                            className="text-[#ec3750] font-bold hover:underline"
                           >
-                            [Log out]
+                            [LOG OUT]
                           </button>
-                        ) : (
-                          <button
-                            onClick={() => signIn("hackclub")}
-                            className="text-[#1565c0] font-bold underline"
-                          >
-                            Connect Slack ↗
-                          </button>
-                        )}
+                        </div>
                       </div>
+
                     </div>
                   </div>
 
                   {/* TOP-RIGHT: DESKTOP APPS & FOLDER ICONS */}
-                  <div className="md:col-span-7 flex flex-wrap gap-4 items-start justify-start sm:justify-end">
+                  <div className="md:col-span-7 flex flex-wrap gap-3 sm:gap-4 items-start justify-start sm:justify-end">
                     
                     {/* Folder 1: Ship App */}
                     <div
                       onClick={() => setActiveWindow("ship")}
-                      className="w-20 flex flex-col items-center gap-1 cursor-pointer p-2 rounded hover:bg-white/10 active:scale-95 transition-all text-white font-pixel text-[11px] text-center"
+                      className="w-18 sm:w-20 flex flex-col items-center gap-1 cursor-pointer p-1.5 sm:p-2 rounded hover:bg-white/10 active:scale-95 transition-all text-white font-pixel text-[10px] sm:text-[11px] text-center"
                     >
-                      <div className="w-12 h-12 bg-[#ffe066] rounded-lg border-2 border-white flex items-center justify-center text-2xl shadow-md">
+                      <div className="w-11 h-11 sm:w-12 sm:h-12 bg-[#ffe066] rounded-lg border-2 border-white flex items-center justify-center text-xl sm:text-2xl shadow-md">
                         📦
                       </div>
                       <span className="drop-shadow">Ship Project</span>
@@ -321,21 +507,21 @@ export default function RetroComputerHero() {
 
                     {/* Folder 2: Roadmap */}
                     <div
-                      onClick={() => scrollToSection("quest", "Roadmap")}
-                      className="w-20 flex flex-col items-center gap-1 cursor-pointer p-2 rounded hover:bg-white/10 active:scale-95 transition-all text-white font-pixel text-[11px] text-center"
+                      onClick={() => setActiveWindow("roadmap")}
+                      className="w-18 sm:w-20 flex flex-col items-center gap-1 cursor-pointer p-1.5 sm:p-2 rounded hover:bg-white/10 active:scale-95 transition-all text-white font-pixel text-[10px] sm:text-[11px] text-center"
                     >
-                      <div className="w-12 h-12 bg-[#38a3a5] rounded-lg border-2 border-white flex items-center justify-center text-2xl shadow-md">
+                      <div className="w-11 h-11 sm:w-12 sm:h-12 bg-[#38a3a5] rounded-lg border-2 border-white flex items-center justify-center text-xl sm:text-2xl shadow-md">
                         📜
                       </div>
-                      <span className="drop-shadow">Roadmap ↓</span>
+                      <span className="drop-shadow">Roadmap</span>
                     </div>
 
                     {/* Folder 3: Shop / Loot */}
                     <div
                       onClick={() => setActiveWindow("shop")}
-                      className="w-20 flex flex-col items-center gap-1 cursor-pointer p-2 rounded hover:bg-white/10 active:scale-95 transition-all text-white font-pixel text-[11px] text-center"
+                      className="w-18 sm:w-20 flex flex-col items-center gap-1 cursor-pointer p-1.5 sm:p-2 rounded hover:bg-white/10 active:scale-95 transition-all text-white font-pixel text-[10px] sm:text-[11px] text-center"
                     >
-                      <div className="w-12 h-12 bg-[#ec3750] rounded-lg border-2 border-white flex items-center justify-center text-2xl shadow-md">
+                      <div className="w-11 h-11 sm:w-12 sm:h-12 bg-[#ec3750] rounded-lg border-2 border-white flex items-center justify-center text-xl sm:text-2xl shadow-md">
                         🛍️
                       </div>
                       <span className="drop-shadow">Shop</span>
@@ -344,24 +530,48 @@ export default function RetroComputerHero() {
                     {/* Folder 4: Discussion Room */}
                     <div
                       onClick={() => setActiveWindow("chat")}
-                      className="w-20 flex flex-col items-center gap-1 cursor-pointer p-2 rounded hover:bg-white/10 active:scale-95 transition-all text-white font-pixel text-[11px] text-center"
+                      className="w-18 sm:w-20 flex flex-col items-center gap-1 cursor-pointer p-1.5 sm:p-2 rounded hover:bg-white/10 active:scale-95 transition-all text-white font-pixel text-[10px] sm:text-[11px] text-center"
                     >
-                      <div className="w-12 h-12 bg-[#57cc99] rounded-lg border-2 border-white flex items-center justify-center text-2xl shadow-md">
+                      <div className="w-11 h-11 sm:w-12 sm:h-12 bg-[#57cc99] rounded-lg border-2 border-white flex items-center justify-center text-xl sm:text-2xl shadow-md">
                         💬
                       </div>
                       <span className="drop-shadow">Discuss</span>
                     </div>
 
-                    {/* Folder 5: FAQ */}
+                    {/* Folder 5: FAQ (Opens directly inside PC) */}
                     <div
-                      onClick={() => scrollToSection("faq", "FAQ")}
-                      className="w-20 flex flex-col items-center gap-1 cursor-pointer p-2 rounded hover:bg-white/10 active:scale-95 transition-all text-white font-pixel text-[11px] text-center"
+                      onClick={() => setActiveWindow("faq")}
+                      className="w-18 sm:w-20 flex flex-col items-center gap-1 cursor-pointer p-1.5 sm:p-2 rounded hover:bg-white/10 active:scale-95 transition-all text-white font-pixel text-[10px] sm:text-[11px] text-center"
                     >
-                      <div className="w-12 h-12 bg-[#ffffff] text-[#181926] rounded-lg border-2 border-[#181926] flex items-center justify-center text-2xl shadow-md">
+                      <div className="w-11 h-11 sm:w-12 sm:h-12 bg-[#ffffff] text-[#181926] rounded-lg border-2 border-[#181926] flex items-center justify-center text-xl sm:text-2xl shadow-md">
                         ❓
                       </div>
-                      <span className="drop-shadow">FAQ ↓</span>
+                      <span className="drop-shadow">FAQ</span>
                     </div>
+
+                    {/* App 6: Dashboard */}
+                    <Link
+                      href="/dashboard"
+                      className="w-18 sm:w-20 flex flex-col items-center gap-1 cursor-pointer p-1.5 sm:p-2 rounded hover:bg-white/10 active:scale-95 transition-all text-white font-pixel text-[10px] sm:text-[11px] text-center"
+                    >
+                      <div className="w-11 h-11 sm:w-12 sm:h-12 bg-[#ffe066] text-[#181926] rounded-lg border-2 border-white flex items-center justify-center text-xl sm:text-2xl shadow-md">
+                        ⚡
+                      </div>
+                      <span className="drop-shadow">Dashboard</span>
+                    </Link>
+
+                    {/* App 7: Admin (Restricted strictly to U0BTDMCJ6P7) */}
+                    {isAdmin && (
+                      <Link
+                        href="/admin"
+                        className="w-18 sm:w-20 flex flex-col items-center gap-1 cursor-pointer p-1.5 sm:p-2 rounded hover:bg-white/10 active:scale-95 transition-all text-white font-pixel text-[10px] sm:text-[11px] text-center"
+                      >
+                        <div className="w-11 h-11 sm:w-12 sm:h-12 bg-[#181926] text-white rounded-lg border-2 border-[#ec3750] flex items-center justify-center text-xl sm:text-2xl shadow-md">
+                          🛡️
+                        </div>
+                        <span className="drop-shadow text-[#ffe066]">Admin</span>
+                      </Link>
+                    )}
 
                   </div>
 
@@ -369,13 +579,13 @@ export default function RetroComputerHero() {
 
                 {/* POPUP RETRO WINDOW WHEN AN ICON IS OPENED */}
                 {activeWindow && (
-                  <div className="absolute inset-x-4 top-4 bottom-14 bg-white rounded-lg border-3 border-[#181926] shadow-[8px_8px_0px_#181926] z-30 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                  <div className="absolute inset-2 sm:inset-3 bottom-12 bg-white rounded-lg border-3 border-[#181926] shadow-[8px_8px_0px_#181926] z-30 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                     
                     {/* Window Titlebar */}
-                    <div className="bg-[#181926] text-white px-3 py-2 flex items-center justify-between font-pixel text-xs">
+                    <div className="bg-[#181926] text-white px-3 py-2 flex items-center justify-between font-pixel text-xs shrink-0 select-none">
                       <div className="flex items-center gap-2">
                         <span className="w-3 h-3 rounded-full bg-[#ec3750] inline-block"></span>
-                        <span className="font-bold uppercase">
+                        <span className="font-bold uppercase tracking-wide">
                           {activeWindow === "ship" && "📦 SHIP_SUBMISSION_APP.EXE"}
                           {activeWindow === "shop" && "🛍️ FORTUNE_REWARDS_SHOP.EXE"}
                           {activeWindow === "chat" && "💬 FOUNDER_SLACK_CHAT.EXE"}
@@ -385,54 +595,396 @@ export default function RetroComputerHero() {
                       </div>
                       <button
                         onClick={() => setActiveWindow(null)}
-                        className="bg-[#ec3750] hover:bg-[#d6253e] text-white px-2 py-0.5 rounded font-bold"
+                        className="bg-[#ec3750] hover:bg-[#d6253e] text-white px-2.5 py-0.5 rounded font-bold transition-colors"
                       >
                         ✕ CLOSE
                       </button>
                     </div>
 
                     {/* Window Scrollable Body */}
-                    <div className="p-5 flex-1 overflow-y-auto text-[#181926]">
+                    <div className="p-4 sm:p-6 flex-1 overflow-y-auto text-[#181926]">
+                      
+                      {/* WINDOW: SHIP PROJECT */}
                       {activeWindow === "ship" && (
-                        <div className="space-y-4 max-w-lg mx-auto">
-                          <h3 className="font-sans font-black text-2xl">Ready to ship to Step 1 Review?</h3>
-                          <p className="font-doodle text-base text-gray-600">
-                            Our review team (@Noben_Nobi &amp; organizers) checks your working demo and opens your HCB seed grant.
+                        <div className="space-y-4 max-w-lg mx-auto text-center py-4">
+                          <span className="text-5xl block animate-bounce">📦</span>
+                          <h3 className="font-sans font-black text-2xl sm:text-3xl">Ready to ship to Step 1 Review?</h3>
+                          <p className="font-doodle text-sm sm:text-base text-gray-600">
+                            Our review team (@Noben_Nobi &amp; organizers) checks your working demo and opens your $100 HCB seed grant.
                           </p>
-                          <Link
-                            href="/dashboard"
-                            className="fortune-btn fortune-btn-gold text-sm block text-center py-3"
-                          >
-                            🚀 Open Full Shipping Dashboard
-                          </Link>
-                        </div>
-                      )}
-
-                      {activeWindow === "shop" && (
-                        <div className="space-y-4 text-center">
-                          <h3 className="font-sans font-black text-2xl">Fortune Loot &amp; Grand Prizes 🛍️</h3>
-                          <p className="font-doodle text-lg text-gray-600">
-                            Convert verified startup revenue into Fortune Points or win the Top 5 Grand Prizes!
-                          </p>
-                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 font-pixel text-xs">
-                            <div className="p-3 bg-[#f7f1e1] border-2 border-[#181926] rounded">
-                              🏆 Top 5 Grand Prize
-                            </div>
-                            <div className="p-3 bg-[#f7f1e1] border-2 border-[#181926] rounded">
-                              💻 Hardware Grants
-                            </div>
-                            <div className="p-3 bg-[#f7f1e1] border-2 border-[#181926] rounded">
-                              🥠 Golden Fortune Trophy
-                            </div>
+                          <div className="pt-2">
+                            <Link
+                              href="/dashboard"
+                              className="fortune-btn fortune-btn-gold text-sm block text-center py-3.5 shadow-[4px_4px_0px_#181926]"
+                            >
+                              🚀 Open Founder Shipping Dashboard ↗
+                            </Link>
                           </div>
                         </div>
                       )}
 
+                      {/* WINDOW: REWARDS SHOP */}
+                      {activeWindow === "shop" && (
+                        <div className="space-y-4">
+                          <div className="text-center border-b-2 border-dashed border-[#181926]/20 pb-3">
+                            <h3 className="font-sans font-black text-2xl sm:text-3xl text-[#181926] flex items-center justify-center gap-2">
+                              <span>🛍️</span> Fortune Hardware &amp; Rewards Store
+                            </h3>
+                            <p className="font-doodle text-sm sm:text-base text-gray-600 mt-1">
+                              Convert verified startup revenue into Fortune Points or win Top 5 Demo Day grand prizes!
+                            </p>
+                            <div className="inline-flex items-center gap-2 mt-2 bg-[#ffe066] border border-[#181926] px-3 py-1 rounded-full font-pixel text-[11px] font-bold text-[#181926]">
+                              <span>⚡ $1 Revenue = 10 Fortune Points</span>
+                              <span>•</span>
+                              <span>📦 Free Worldwide Shipping via Hack Club</span>
+                            </div>
+                          </div>
+
+                          {/* Exciting Prizes Grid */}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 pt-1 text-left font-sans">
+                            
+                            {/* Prize 1: Bambu Lab A1 3D Printer */}
+                            <div className="bg-[#fffdf5] border-2 border-[#181926] rounded-xl p-3 flex flex-col justify-between shadow-[3px_3px_0px_#181926] hover:translate-y-[-2px] transition-transform">
+                              <div>
+                                <div className="flex items-center justify-between text-[10px] font-pixel mb-1">
+                                  <span className="bg-[#fee2e2] text-[#ec3750] border border-[#ec3750]/30 px-1.5 py-0.5 rounded font-bold">
+                                    🖨️ Grand Hardware
+                                  </span>
+                                  <span className="font-mono text-gray-500">$950+ Rev</span>
+                                </div>
+                                <div className="h-32 w-full bg-white border border-[#181926]/15 rounded-lg p-2 flex items-center justify-center overflow-hidden my-1 shadow-inner">
+                                  <img
+                                    src="/rewards/bambu-a1-printer.png"
+                                    alt="Bambu Lab A1 3D Printer"
+                                    className="h-full w-full object-contain hover:scale-105 transition-transform"
+                                  />
+                                </div>
+                                <h4 className="font-black text-sm text-[#181926] leading-tight">
+                                  Bambu Lab A1 3D Printer
+                                </h4>
+                                <p className="font-doodle text-xs text-[#4a4e66] mt-1 leading-snug">
+                                  High-speed multicolor precision CoreXY 3D printer for hardware founders.
+                                </p>
+                              </div>
+                              <div className="pt-2 mt-2 border-t border-[#181926]/10 flex items-center justify-between font-mono text-xs">
+                                <strong className="text-[#ec3750] font-bold">10,000 PTS</strong>
+                                <span className="text-[10px] bg-[#fee2e2] text-[#ec3750] border border-[#ec3750]/30 px-1.5 py-0.5 rounded font-pixel">
+                                  Top Tier
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Prize 2: Apple AirPods Max */}
+                            <div className="bg-[#fffdf5] border-2 border-[#181926] rounded-xl p-3 flex flex-col justify-between shadow-[3px_3px_0px_#181926] hover:translate-y-[-2px] transition-transform">
+                              <div>
+                                <div className="flex items-center justify-between text-[10px] font-pixel mb-1">
+                                  <span className="bg-[#e0e7ff] text-[#4338ca] border border-[#4338ca]/30 px-1.5 py-0.5 rounded font-bold">
+                                    🎧 Pro Audio
+                                  </span>
+                                  <span className="font-mono text-gray-500">$750 Rev</span>
+                                </div>
+                                <div className="h-32 w-full bg-white border border-[#181926]/15 rounded-lg p-2 flex items-center justify-center overflow-hidden my-1 shadow-inner">
+                                  <img
+                                    src="/rewards/airpods-max.jpg"
+                                    alt="Apple AirPods Max"
+                                    className="h-full w-full object-contain hover:scale-105 transition-transform"
+                                  />
+                                </div>
+                                <h4 className="font-black text-sm text-[#181926] leading-tight">
+                                  Apple AirPods Max
+                                </h4>
+                                <p className="font-doodle text-xs text-[#4a4e66] mt-1 leading-snug">
+                                  High-fidelity audio with Active Noise Cancellation for deep focus coding sessions.
+                                </p>
+                              </div>
+                              <div className="pt-2 mt-2 border-t border-[#181926]/10 flex items-center justify-between font-mono text-xs">
+                                <strong className="text-[#4338ca] font-bold">8,000 PTS</strong>
+                                <span className="text-[10px] bg-[#e0e7ff] text-[#4338ca] border border-[#4338ca]/30 px-1.5 py-0.5 rounded font-pixel">
+                                  Deep Focus
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Prize 3: Custom 75% Mechanical Keyboard */}
+                            <div className="bg-[#fffdf5] border-2 border-[#181926] rounded-xl p-3 flex flex-col justify-between shadow-[3px_3px_0px_#181926] hover:translate-y-[-2px] transition-transform">
+                              <div>
+                                <div className="flex items-center justify-between text-[10px] font-pixel mb-1">
+                                  <span className="bg-[#fef3c7] text-[#b45309] border border-[#b45309]/30 px-1.5 py-0.5 rounded font-bold">
+                                    ⌨️ Hardware Swag
+                                  </span>
+                                  <span className="font-mono text-gray-500">$400 Rev</span>
+                                </div>
+                                <div className="h-32 w-full bg-white border border-[#181926]/15 rounded-lg p-2 flex items-center justify-center overflow-hidden my-1 shadow-inner">
+                                  <img
+                                    src="/rewards/custom-mech-keyboard.png"
+                                    alt="Custom 75% Mechanical Keyboard"
+                                    className="h-full w-full object-contain hover:scale-105 transition-transform"
+                                  />
+                                </div>
+                                <h4 className="font-black text-sm text-[#181926] leading-tight">
+                                  Custom 75% Mechanical Keyboard
+                                </h4>
+                                <p className="font-doodle text-xs text-[#4a4e66] mt-1 leading-snug">
+                                  Hot-swappable tactile switches, metallic rotary knob &amp; factory-lubed keycaps.
+                                </p>
+                              </div>
+                              <div className="pt-2 mt-2 border-t border-[#181926]/10 flex items-center justify-between font-mono text-xs">
+                                <strong className="text-[#b45309] font-bold">4,500 PTS</strong>
+                                <span className="text-[10px] bg-[#fef3c7] text-[#b45309] border border-[#b45309]/30 px-1.5 py-0.5 rounded font-pixel">
+                                  Top Pick
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Prize 4: Fortune Founder Embroidered Tee */}
+                            <div className="bg-[#fffdf5] border-2 border-[#181926] rounded-xl p-3 flex flex-col justify-between shadow-[3px_3px_0px_#181926] hover:translate-y-[-2px] transition-transform">
+                              <div>
+                                <div className="flex items-center justify-between text-[10px] font-pixel mb-1">
+                                  <span className="bg-[#fef3c7] text-[#b45309] border border-[#b45309]/30 px-1.5 py-0.5 rounded font-bold">
+                                    👕 Custom Apparel
+                                  </span>
+                                  <span className="font-mono text-gray-500">$100 Rev</span>
+                                </div>
+                                <div className="h-32 w-full bg-white border border-[#181926]/15 rounded-lg p-2 flex items-center justify-center overflow-hidden my-1 shadow-inner">
+                                  <img
+                                    src="/rewards/founder-tee.webp"
+                                    alt="Fortune Founder Embroidered Tee"
+                                    className="h-full w-full object-contain hover:scale-105 transition-transform"
+                                  />
+                                </div>
+                                <h4 className="font-black text-sm text-[#181926] leading-tight">
+                                  Fortune Founder Embroidered Tee
+                                </h4>
+                                <p className="font-doodle text-xs text-[#4a4e66] mt-1 leading-snug">
+                                  Heavyweight 100% combed cotton tee with custom Fortune pixel embroidery.
+                                </p>
+                              </div>
+                              <div className="pt-2 mt-2 border-t border-[#181926]/10 flex items-center justify-between font-mono text-xs">
+                                <strong className="text-[#ec3750] font-bold">1,500 PTS</strong>
+                                <span className="text-[10px] bg-[#fef3c7] text-[#b45309] border border-[#b45309]/30 px-1.5 py-0.5 rounded font-pixel">
+                                  Popular
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Prize 5: Raspberry Pi 5 8GB Starter Kit */}
+                            <div className="bg-[#fffdf5] border-2 border-[#181926] rounded-xl p-3 flex flex-col justify-between shadow-[3px_3px_0px_#181926] hover:translate-y-[-2px] transition-transform">
+                              <div>
+                                <div className="flex items-center justify-between text-[10px] font-pixel mb-1">
+                                  <span className="bg-[#fee2e2] text-[#991b1b] border border-[#991b1b]/30 px-1.5 py-0.5 rounded font-bold">
+                                    🍓 Dev Kit
+                                  </span>
+                                  <span className="font-mono text-gray-500">$250 Rev</span>
+                                </div>
+                                <div className="h-32 w-full bg-white border border-[#181926]/15 rounded-lg p-2 flex items-center justify-center my-1 shadow-inner text-5xl">
+                                  🍓
+                                </div>
+                                <h4 className="font-black text-sm text-[#181926] leading-tight">
+                                  Raspberry Pi 5 (8GB) Kit
+                                </h4>
+                                <p className="font-doodle text-xs text-[#4a4e66] mt-1 leading-snug">
+                                  High-performance ARM mini-computer with official power supply, active cooler &amp; case.
+                                </p>
+                              </div>
+                              <div className="pt-2 mt-2 border-t border-[#181926]/10 flex items-center justify-between font-mono text-xs">
+                                <strong className="text-[#ec3750] font-bold">3,000 PTS</strong>
+                                <span className="text-[10px] bg-[#fee2e2] text-[#991b1b] border border-[#991b1b]/30 px-1.5 py-0.5 rounded font-pixel">
+                                  Self-Host MVP
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Prize 6: Holographic Die-Cut Sticker Pack */}
+                            <div className="bg-[#fffdf5] border-2 border-[#181926] rounded-xl p-3 flex flex-col justify-between shadow-[3px_3px_0px_#181926] hover:translate-y-[-2px] transition-transform">
+                              <div>
+                                <div className="flex items-center justify-between text-[10px] font-pixel mb-1">
+                                  <span className="bg-[#dcfce7] text-[#15803d] border border-[#15803d]/30 px-1.5 py-0.5 rounded font-bold">
+                                    ✨ Base Loot
+                                  </span>
+                                  <span className="font-mono text-gray-500">Free Ship</span>
+                                </div>
+                                <div className="h-32 w-full bg-white border border-[#181926]/15 rounded-lg p-2 flex items-center justify-center my-1 shadow-inner text-5xl">
+                                  🥠
+                                </div>
+                                <h4 className="font-black text-sm text-[#181926] leading-tight">
+                                  Die-Cut Sticker Pack &amp; Pass
+                                </h4>
+                                <p className="font-doodle text-xs text-[#4a4e66] mt-1 leading-snug">
+                                  Official vinyl sticker pack and official Fortune Founder verification card.
+                                </p>
+                              </div>
+                              <div className="pt-2 mt-2 border-t border-[#181926]/10 flex items-center justify-between font-mono text-xs">
+                                <strong className="text-[#15803d] font-bold">500 PTS</strong>
+                                <span className="text-[10px] bg-[#dcfce7] text-[#15803d] border border-[#15803d]/30 px-1.5 py-0.5 rounded font-pixel">
+                                  All Shippers
+                                </span>
+                              </div>
+                            </div>
+
+                          </div>
+
+                          {/* Top 5 Grand Prize Banner */}
+                          <div className="bg-white border-2 border-[#181926] rounded-xl p-4 shadow-[3px_3px_0px_#181926] text-left flex flex-col sm:flex-row items-center justify-between gap-3 mt-4">
+                            <div className="flex items-center gap-3">
+                              <span className="text-3xl">🏆</span>
+                              <div>
+                                <h4 className="font-sans font-black text-base text-[#181926]">
+                                  Top 5 Demo Day Grand Prizes
+                                </h4>
+                                <p className="font-doodle text-xs text-gray-600">
+                                  The highest-traction teenage founders win <strong>$1,000 cash seed grants</strong>, <strong>MacBook Airs</strong>, and the <strong>Golden Fortune Trophy</strong>!
+                                </p>
+                              </div>
+                            </div>
+                            <Link
+                              href="/dashboard"
+                              className="fortune-btn fortune-btn-gold text-xs py-2 px-4 whitespace-nowrap text-center"
+                            >
+                              🚀 Ship Project
+                            </Link>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* WINDOW: ROADMAP & INTERACTIVE CALCULATOR (WITH LOOT PHOTOS) */}
+                      {activeWindow === "roadmap" && (
+                        <div className="space-y-6 max-w-4xl mx-auto py-2">
+                          <div className="text-center border-b-2 border-dashed border-[#181926]/20 pb-3">
+                            <span className="font-pixel text-xs bg-[#38a3a5] text-white px-3 py-1 rounded border border-[#181926] inline-block mb-1">
+                              THE SPRINT ROADMAP 📜
+                            </span>
+                            <h3 className="font-sans font-black text-2xl sm:text-3xl text-[#181926]">
+                              How Fortune Works from 0 to 1
+                            </h3>
+                            <p className="font-doodle text-xs sm:text-sm text-gray-600 mt-1">
+                              Code real software, pass Step 1 Review for $100 seed grant, and build real revenue!
+                            </p>
+                          </div>
+
+                          {/* 3 Step Cards */}
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-left">
+                            <div className="p-3.5 bg-[#fffdf0] border-2 border-[#181926] rounded-xl shadow-[3px_3px_0px_#181926]">
+                              <div className="flex items-center justify-between font-pixel text-xs mb-1 text-[#ec3750] font-bold">
+                                <span>STEP 01</span>
+                                <span>THE FORGE</span>
+                              </div>
+                              <h4 className="font-sans font-black text-base text-[#181926] mb-1">Code &amp; Track Time</h4>
+                              <p className="text-xs text-[#4a4e66] leading-relaxed">
+                                Build your project (web app, game, dev tool) and log hours on Hackatime so we know you didn't just ask AI to generate it in 5 minutes.
+                              </p>
+                            </div>
+
+                            <div className="p-3.5 bg-[#e8f7ee] border-2 border-[#181926] rounded-xl shadow-[3px_3px_0px_#181926]">
+                              <div className="flex items-center justify-between font-pixel text-xs mb-1 text-[#10b981] font-bold">
+                                <span>STEP 02</span>
+                                <span>MICRO-GRANT</span>
+                              </div>
+                              <h4 className="font-sans font-black text-base text-[#181926] mb-1">Submit &amp; Get $100</h4>
+                              <p className="text-xs text-[#4a4e66] leading-relaxed">
+                                Submit your pitch and GitHub demo to Step 1 Review. Once approved, we issue a $100 HCB grant with 0% equity to fund domains and APIs.
+                              </p>
+                            </div>
+
+                            <div className="p-3.5 bg-[#fef3c7] border-2 border-[#181926] rounded-xl shadow-[3px_3px_0px_#181926]">
+                              <div className="flex items-center justify-between font-pixel text-xs mb-1 text-[#b45309] font-bold">
+                                <span>STEP 03</span>
+                                <span>REVENUE &amp; LOOT</span>
+                              </div>
+                              <h4 className="font-sans font-black text-base text-[#181926] mb-1">Make Sales &amp; Win Loot</h4>
+                              <p className="text-xs text-[#4a4e66] leading-relaxed">
+                                Every dollar in revenue converts to 10 Fortune Points to spend on mechanical keyboards, 3D printers, AirPods Max, and custom tees!
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Interactive Calculator with Photos */}
+                          <div className="border-2 border-[#181926] rounded-2xl bg-[#fffdf5] shadow-[4px_4px_0px_#181926] overflow-hidden">
+                            <StartupCalculator compact={true} />
+                          </div>
+                        </div>
+                      )}
+
+                      {/* WINDOW: FAQ & RULES (RENDERED DIRECTLY INSIDE PC) */}
+                      {activeWindow === "faq" && (
+                        <div className="space-y-4 max-w-3xl mx-auto py-2">
+                          {/* FAQ Header with Search */}
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-2 border-dashed border-[#181926]/20 pb-3">
+                            <div>
+                              <h3 className="font-sans font-black text-2xl text-[#181926] flex items-center gap-2">
+                                <span>❓</span> Fortune FAQ &amp; Rules
+                              </h3>
+                              <p className="font-doodle text-xs text-gray-600 mt-0.5">
+                                Everything you need to know about seed grants, Hackatime, shipping &amp; loot.
+                              </p>
+                            </div>
+                            <div className="relative">
+                              <input
+                                type="text"
+                                placeholder="Search questions (e.g. AI, grants)..."
+                                value={faqSearch}
+                                onChange={(e) => setFaqSearch(e.target.value)}
+                                className="w-full sm:w-64 px-3 py-1.5 text-xs font-mono rounded-lg border-2 border-[#181926] bg-[#fffdf5] focus:outline-none focus:ring-2 focus:ring-[#ec3750]"
+                              />
+                              {faqSearch && (
+                                <button
+                                  onClick={() => setFaqSearch("")}
+                                  className="absolute right-2 top-1.5 text-xs text-gray-500 font-bold hover:text-black"
+                                >
+                                  ✕
+                                </button>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Filtered FAQs */}
+                          <div className="space-y-2.5">
+                            {filteredFaqs.map((faq, i) => {
+                              const isOpen = expandedFaqIndex === i;
+                              return (
+                                <div
+                                  key={i}
+                                  className="border-2 border-[#181926] rounded-xl bg-[#fffdf0] overflow-hidden shadow-[2px_2px_0px_#181926] transition-all"
+                                >
+                                  <button
+                                    onClick={() => setExpandedFaqIndex(isOpen ? null : i)}
+                                    className="w-full p-3 text-left font-sans font-bold text-xs sm:text-sm text-[#181926] flex items-center justify-between gap-2 hover:bg-[#ffe066]/30 transition-colors"
+                                  >
+                                    <span className="flex items-center gap-2">
+                                      <span className="text-[10px] font-pixel bg-[#181926] text-white px-1.5 py-0.5 rounded">Q{i + 1}</span>
+                                      <span>{faq.q}</span>
+                                    </span>
+                                    <span className="font-pixel text-xs text-[#ec3750]">{isOpen ? "▲" : "▼"}</span>
+                                  </button>
+                                  {isOpen && (
+                                    <div className="p-3 pt-0 border-t border-[#181926]/10 text-xs text-[#3a3d52] font-medium leading-relaxed bg-white">
+                                      {faq.a}
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+
+                          <div className="bg-[#e0f2fe] border-2 border-[#0284c7] rounded-xl p-3 text-xs text-[#0369a1] flex items-center justify-between gap-3">
+                            <span>Still have a question? Ask organizers directly in Slack:</span>
+                            <a
+                              href="https://hackclub.slack.com/messages/fortune-help"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="bg-[#0284c7] text-white px-3 py-1 rounded font-pixel font-bold hover:bg-[#0369a1] whitespace-nowrap"
+                            >
+                              #fortune-help ↗
+                            </a>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* WINDOW: SLACK DISCUSSION */}
                       {activeWindow === "chat" && (
-                        <div className="space-y-4 text-center max-w-md mx-auto">
-                          <span className="text-4xl block">💬</span>
+                        <div className="space-y-4 text-center max-w-md mx-auto py-4">
+                          <span className="text-5xl block animate-pulse">💬</span>
                           <h3 className="font-sans font-black text-2xl">Founder Discussion Channels</h3>
-                          <p className="font-doodle text-base text-gray-600">
+                          <p className="font-doodle text-sm text-gray-600">
                             Hang out, brainstorm startup mechanics, share daily commits, and get help from organizers!
                           </p>
                           <div className="flex flex-col gap-2 pt-2">
@@ -440,7 +992,7 @@ export default function RetroComputerHero() {
                               href="https://hackclub.slack.com/messages/fortune"
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="fortune-btn text-xs py-2"
+                              className="fortune-btn text-xs py-2.5 shadow-[2px_2px_0px_#181926]"
                             >
                               Join #fortune (Chat &amp; Brainstorm) ↗
                             </a>
@@ -448,7 +1000,7 @@ export default function RetroComputerHero() {
                               href="https://hackclub.slack.com/messages/fortune-help"
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="fortune-btn fortune-btn-gold text-xs py-2"
+                              className="fortune-btn fortune-btn-gold text-xs py-2.5 shadow-[2px_2px_0px_#181926]"
                             >
                               Join #fortune-help (Organizer Support) ↗
                             </a>
@@ -456,85 +1008,151 @@ export default function RetroComputerHero() {
                         </div>
                       )}
 
-                      {activeWindow === "roadmap" && (
-                        <div className="space-y-4">
-                          <h3 className="font-sans font-black text-2xl">Founder Sprint Roadmap 📜</h3>
-                          <ol className="space-y-2 font-pixel text-xs text-gray-700 list-decimal pl-5">
-                            <li>Code initial MVP &amp; track 10+ hours on Hackatime</li>
-                            <li>Pass Step 1 Review &amp; get $50–$150 seed funding via HCB</li>
-                            <li>3–4 Month Growth Sprint (get real paying users!)</li>
-                            <li>Pass Step 2 Review: Win Top 5 Grand Prizes or claim shop swag!</li>
-                          </ol>
-                        </div>
-                      )}
-
-                      {activeWindow === "faq" && (
-                        <div className="space-y-3 font-mono text-xs text-gray-700">
-                          <div>
-                            <strong className="text-sm font-bold block text-black">Q: Who can join?</strong>
-                            Any teenager 18 or under worldwide. 100% free!
-                          </div>
-                          <div>
-                            <strong className="text-sm font-bold block text-black">Q: Is seed money real?</strong>
-                            Yes! Granted through Hack Club Bank. Hack Club takes 0% equity.
-                          </div>
-                        </div>
-                      )}
                     </div>
                   </div>
                 )}
 
                 {/* BOTTOM TASKBAR / NAVIGATION BAR */}
-                <div className="bg-[#181926] text-white px-3 py-2 border-t-2 border-[#181926] flex items-center justify-between font-pixel text-xs relative z-20">
+                <div className="bg-[#181926] text-white px-3 py-1.5 border-t-2 border-[#181926] flex items-center justify-between font-pixel text-xs relative z-40 shrink-0 select-none">
                   
-                  {/* Start / Home button */}
+                  {/* Start Button & Active Window Tabs */}
                   <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => setActiveWindow(null)}
-                      className="bg-[#ffe066] hover:bg-[#ffd533] text-[#181926] px-3 py-1 rounded font-bold flex items-center gap-1.5 shadow-[1px_1px_0px_#000]"
-                    >
-                      <span>🥠</span>
-                      <span>Start</span>
-                    </button>
-
-                    <div className="hidden sm:flex items-center gap-2 pl-2 border-l border-gray-700">
+                    <div className="relative">
                       <button
-                        onClick={() => setActiveWindow("ship")}
-                        className={`px-2 py-1 rounded hover:bg-gray-800 ${
-                          activeWindow === "ship" ? "bg-gray-800 border border-gray-600" : ""
+                        onClick={() => setStartMenuOpen(!startMenuOpen)}
+                        className="bg-[#ffe066] hover:bg-[#ffd533] text-[#181926] px-3 py-1 rounded font-bold flex items-center gap-1.5 shadow-[1px_1px_0px_#000] active:scale-95 transition-transform"
+                      >
+                        <span>🥠</span>
+                        <span>Start</span>
+                      </button>
+
+                      {/* Retro Start Menu */}
+                      {startMenuOpen && (
+                        <div className="absolute left-0 bottom-full mb-1 w-56 bg-[#e8dec0] border-3 border-[#181926] rounded-lg shadow-[6px_6px_0px_#181926] p-2 text-[#181926] z-50 animate-in fade-in zoom-in-95 font-pixel text-xs">
+                          <div className="bg-[#181926] text-white p-2 rounded mb-2 text-center">
+                            <div className="text-sm font-bold">Fortune OS 1.0</div>
+                            <div className="text-[10px] text-[#ffe066] truncate">@{session?.user?.name || "clubber"}</div>
+                          </div>
+                          
+                          <div className="space-y-1">
+                            <button
+                              onClick={() => { setActiveWindow("ship"); setStartMenuOpen(false); }}
+                              className="w-full text-left p-1.5 rounded hover:bg-[#ffe066] flex items-center gap-2"
+                            >
+                              <span>📦</span> <span>Ship Project</span>
+                            </button>
+                            <button
+                              onClick={() => { setActiveWindow("roadmap"); setStartMenuOpen(false); }}
+                              className="w-full text-left p-1.5 rounded hover:bg-[#ffe066] flex items-center gap-2"
+                            >
+                              <span>📜</span> <span>Roadmap &amp; Calculator</span>
+                            </button>
+                            <button
+                              onClick={() => { setActiveWindow("shop"); setStartMenuOpen(false); }}
+                              className="w-full text-left p-1.5 rounded hover:bg-[#ffe066] flex items-center gap-2"
+                            >
+                              <span>🛍️</span> <span>Rewards Shop</span>
+                            </button>
+                            <button
+                              onClick={() => { setActiveWindow("chat"); setStartMenuOpen(false); }}
+                              className="w-full text-left p-1.5 rounded hover:bg-[#ffe066] flex items-center gap-2"
+                            >
+                              <span>💬</span> <span>Slack Discussion</span>
+                            </button>
+                            <button
+                              onClick={() => { setActiveWindow("faq"); setStartMenuOpen(false); }}
+                              className="w-full text-left p-1.5 rounded hover:bg-[#ffe066] flex items-center gap-2"
+                            >
+                              <span>❓</span> <span>FAQ &amp; Rules</span>
+                            </button>
+                            
+                            <div className="border-t border-[#181926]/20 my-1 pt-1">
+                              <Link
+                                href="/dashboard"
+                                onClick={() => setStartMenuOpen(false)}
+                                className="w-full text-left p-1.5 rounded hover:bg-[#ffe066] flex items-center gap-2 block"
+                              >
+                                <span>⚡</span> <span>Founder Dashboard</span>
+                              </Link>
+                              {isAdmin && (
+                                <Link
+                                  href="/admin"
+                                  onClick={() => setStartMenuOpen(false)}
+                                  className="w-full text-left p-1.5 rounded hover:bg-[#ffe066] flex items-center gap-2 block text-[#ec3750] font-bold"
+                                >
+                                  <span>🛡️</span> <span>Admin Panel</span>
+                                </Link>
+                              )}
+                            </div>
+
+                            <div className="border-t border-[#181926]/20 my-1 pt-1">
+                              <button
+                                onClick={() => signOut()}
+                                className="w-full text-left p-1.5 rounded hover:bg-[#fee2e2] text-[#ec3750] flex items-center gap-2 font-bold"
+                              >
+                                <span>🚪</span> <span>Sign Out</span>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Taskbar Window Tabs */}
+                    <div className="hidden sm:flex items-center gap-1.5 pl-2 border-l border-gray-700">
+                      <button
+                        onClick={() => setActiveWindow(activeWindow === "ship" ? null : "ship")}
+                        className={`px-2 py-0.5 rounded text-[11px] transition-colors ${
+                          activeWindow === "ship" ? "bg-[#ffe066] text-[#181926] font-bold" : "hover:bg-gray-800 text-gray-300"
                         }`}
                       >
                         📦 Ship
                       </button>
                       <button
-                        onClick={() => setActiveWindow("shop")}
-                        className={`px-2 py-1 rounded hover:bg-gray-800 ${
-                          activeWindow === "shop" ? "bg-gray-800 border border-gray-600" : ""
+                        onClick={() => setActiveWindow(activeWindow === "roadmap" ? null : "roadmap")}
+                        className={`px-2 py-0.5 rounded text-[11px] transition-colors ${
+                          activeWindow === "roadmap" ? "bg-[#ffe066] text-[#181926] font-bold" : "hover:bg-gray-800 text-gray-300"
+                        }`}
+                      >
+                        📜 Roadmap
+                      </button>
+                      <button
+                        onClick={() => setActiveWindow(activeWindow === "shop" ? null : "shop")}
+                        className={`px-2 py-0.5 rounded text-[11px] transition-colors ${
+                          activeWindow === "shop" ? "bg-[#ffe066] text-[#181926] font-bold" : "hover:bg-gray-800 text-gray-300"
                         }`}
                       >
                         🛍️ Shop
                       </button>
                       <button
-                        onClick={() => setActiveWindow("chat")}
-                        className={`px-2 py-1 rounded hover:bg-gray-800 ${
-                          activeWindow === "chat" ? "bg-gray-800 border border-gray-600" : ""
+                        onClick={() => setActiveWindow(activeWindow === "chat" ? null : "chat")}
+                        className={`px-2 py-0.5 rounded text-[11px] transition-colors ${
+                          activeWindow === "chat" ? "bg-[#ffe066] text-[#181926] font-bold" : "hover:bg-gray-800 text-gray-300"
                         }`}
                       >
                         💬 Discuss
                       </button>
+                      <button
+                        onClick={() => setActiveWindow(activeWindow === "faq" ? null : "faq")}
+                        className={`px-2 py-0.5 rounded text-[11px] transition-colors ${
+                          activeWindow === "faq" ? "bg-[#ffe066] text-[#181926] font-bold" : "hover:bg-gray-800 text-gray-300"
+                        }`}
+                      >
+                        ❓ FAQ
+                      </button>
                     </div>
                   </div>
 
-                  {/* Right side: Power Off button & Clock */}
-                  <div className="flex items-center gap-3 text-[11px] text-gray-300">
+                  {/* Right side: Shut down & Clock */}
+                  <div className="flex items-center gap-2 text-[11px] text-gray-300">
                     <button
-                      onClick={handlePowerOff}
-                      className="text-[#ec3750] hover:text-white hover:underline"
-                      title="Shut down computer"
+                      onClick={() => signOut()}
+                      className="text-[#ec3750] hover:text-white hover:underline font-bold"
+                      title="Shut down & Sign out"
                     >
                       [Shut Down]
                     </button>
-                    <span className="bg-black/60 px-2 py-0.5 rounded border border-gray-700 text-[#10b981]">
+                    <span className="bg-black/60 px-2 py-0.5 rounded border border-gray-700 text-[#10b981] font-mono">
                       1994 OS
                     </span>
                   </div>
@@ -546,14 +1164,18 @@ export default function RetroComputerHero() {
 
           </div>
 
-          {/* Computer Stand / Base */}
-          <div className="w-48 h-5 bg-[#d9cfb0] mx-auto border-x-4 border-b-4 border-[#181926] rounded-b-xl shadow-md mt-0"></div>
-          <div className="w-72 h-3 bg-[#c9bfa0] mx-auto border-4 border-[#181926] rounded-full shadow-lg"></div>
+          {/* Computer Stand / Base (Only rendered when not fullscreen) */}
+          {!fullscreen && (
+            <>
+              <div className="w-48 h-5 bg-[#d9cfb0] mx-auto border-x-4 border-b-4 border-[#181926] rounded-b-xl shadow-md mt-0"></div>
+              <div className="w-72 h-3 bg-[#c9bfa0] mx-auto border-4 border-[#181926] rounded-full shadow-lg"></div>
+            </>
+          )}
 
         </div>
 
-        {/* Animated Downward Arrow Indicator when Roadmap or FAQ is clicked */}
-        {scrollPrompt && (
+        {/* Animated Downward Arrow Indicator (Only when non-fullscreen) */}
+        {!fullscreen && scrollPrompt && (
           <div className="flex flex-col items-center justify-center mt-6 animate-bounce transition-all">
             <div className="bg-[#ffe066] text-[#181926] px-4 py-2 rounded-full border-3 border-[#181926] shadow-[4px_4px_0px_#181926] font-pixel text-xs sm:text-sm font-bold flex items-center gap-2">
               <span>📜 Scrolling down to {scrollPrompt}</span>
@@ -570,4 +1192,3 @@ export default function RetroComputerHero() {
     </section>
   );
 }
-

@@ -52,3 +52,4 @@
 - **Slack Channels:** `#fortune` & `#fortune-help` on [Hack Club Slack](https://hackclub.com/slack)
 - **Bank:** [Hack Club Bank (HCB)](https://hcb.hackclub.com)
 - **Part of Hack Club:** 501(c)(3) worldwide public charity.
+

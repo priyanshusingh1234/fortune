@@ -1,13 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
-import confetti from "canvas-confetti";
+import React from "react";
+import StartupCalculator from "@/components/StartupCalculator";
 
 export default function FortuneQuestMap() {
-  const [revenue, setRevenue] = useState(250);
-
-  // math that converts money to shop points
-  const points = 500 + revenue * 10;
 
   const steps = [
     {
@@ -102,85 +98,9 @@ export default function FortuneQuestMap() {
       </div>
 
       {/* interactive calculator */}
-      <div className="wobbly-card p-6 sm:p-8 bg-[#fffdf0] max-w-2xl mx-auto mb-16 text-center rotate-[0.5deg]">
+      <div className="wobbly-card bg-[#fffdf0] max-w-2xl mx-auto mb-16 rotate-[0.5deg] relative">
         <div className="tape" />
-        
-        <span className="font-doodle text-xl text-[#ec3750] font-bold block">
-          calculator thingy 🧮
-        </span>
-        <h3 className="font-sans font-black text-3xl text-[#181926] mb-2">
-          Test Your Startup Earnings
-        </h3>
-        <p className="font-doodle text-sm text-[#4a4e66] font-bold mb-6">
-          every dollar of revenue converts into Fortune Points so you can buy cool loot!
-        </p>
-
-        {/* slider */}
-        <div className="max-w-md mx-auto space-y-3 mb-6 text-left">
-          <div className="flex justify-between items-center font-pixel text-sm">
-            <span>Estimated Revenue:</span>
-            <span className="text-xl font-bold bg-[#ffe066] px-3 py-1 rounded border-2 border-[#181926] shadow-[2px_2px_0px_#181926]">
-              ${revenue}
-            </span>
-          </div>
-
-          <input
-            type="range"
-            min="0"
-            max="1000"
-            step="50"
-            value={revenue}
-            onChange={(e) => {
-              setRevenue(Number(e.target.value));
-              if (Number(e.target.value) >= 500) {
-                confetti({ particleCount: 15, spread: 35, origin: { y: 0.8 } });
-              }
-            }}
-            className="w-full h-3 bg-[#e8e2d1] rounded-lg appearance-none cursor-pointer accent-[#181926]"
-          />
-
-          <div className="flex justify-between text-xs font-mono text-[#666a85]">
-            <span>$0 (First commit)</span>
-            <span>$500 (Customers!)</span>
-            <span>$1,000+ (High growth)</span>
-          </div>
-        </div>
-
-        {/* balance */}
-        <div className="p-3 rounded-xl bg-white border-2 border-[#181926] shadow-[2px_2px_0px_#181926] max-w-xs mx-auto mb-6">
-          <div className="font-pixel text-[11px] text-[#ec3750] font-bold">YOUR SHOP POINTS</div>
-          <div className="font-pixel text-2xl text-[#181926] my-1">
-            {points.toLocaleString()} PTS
-          </div>
-          <div className="font-doodle text-xs text-[#10b981] font-bold">
-            {revenue > 0 ? `500 base + ${revenue * 10} pts from sales!` : "500 base completion pts"}
-          </div>
-        </div>
-
-        {/* shop loot */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs">
-          <div className={`p-2.5 rounded-lg border-2 border-[#181926] ${points >= 500 ? "bg-[#d4edda]" : "bg-gray-100 opacity-60"}`}>
-            <span className="text-xl block">✨</span>
-            <span className="font-pixel font-bold block">Stickers</span>
-            <span className="font-mono text-[10px]">500 pts {points >= 500 ? "✓" : ""}</span>
-          </div>
-          <div className={`p-2.5 rounded-lg border-2 border-[#181926] ${points >= 1500 ? "bg-[#d4edda]" : "bg-gray-100 opacity-60"}`}>
-            <span className="text-xl block">🔑</span>
-            <span className="font-pixel font-bold block">YubiKey</span>
-            <span className="font-mono text-[10px]">1,500 pts {points >= 1500 ? "✓" : ""}</span>
-          </div>
-          <div className={`p-2.5 rounded-lg border-2 border-[#181926] ${points >= 3000 ? "bg-[#d4edda]" : "bg-gray-100 opacity-60"}`}>
-            <span className="text-xl block">🍓</span>
-            <span className="font-pixel font-bold block">Raspberry Pi</span>
-            <span className="font-mono text-[10px]">3,000 pts {points >= 3000 ? "✓" : ""}</span>
-          </div>
-          <div className={`p-2.5 rounded-lg border-2 border-[#181926] ${points >= 5000 ? "bg-[#d4edda]" : "bg-gray-100 opacity-60"}`}>
-            <span className="text-xl block">⌨️</span>
-            <span className="font-pixel font-bold block">Keyboard</span>
-            <span className="font-mono text-[10px]">5,000 pts {points >= 5000 ? "✓" : ""}</span>
-          </div>
-        </div>
-
+        <StartupCalculator />
       </div>
 
       {/* note for sponsors */}

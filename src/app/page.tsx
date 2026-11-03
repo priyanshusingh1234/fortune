@@ -1,16 +1,6 @@
-import RetroComputerHero from "@/components/RetroComputerHero";
-import FortuneQuestMap from "@/components/FortuneQuestMap";
-import FortuneFaq from "@/components/FortuneFaq";
-import FortuneFooter from "@/components/FortuneFooter";
+import HomeContent from "@/components/HomeContent";
 
-// main entry page where all the chaos comes together
+// Main entry point for Fortune
 export default function Home() {
-  return (
-    <main className="min-h-screen bg-[#f7f1e1] text-[#181926]">
-      <RetroComputerHero />
-      <FortuneQuestMap />
-      <FortuneFaq />
-      <FortuneFooter />
-    </main>
-  );
+  return <HomeContent />;
 }

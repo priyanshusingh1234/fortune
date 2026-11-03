@@ -113,5 +113,25 @@ summary {
 * {
   margin: 0;
   padding: 0;
+}
 
+/* Thick Yellow Retro Hand Cursor */
+html,
+body,
+body * {
+  cursor: url('/cursor-hand.svg') 11 2, auto;
+}
+
+button,
+a,
+input,
+select,
+textarea,
+[role="button"],
+.cursor-pointer,
+summary,
+input[type="range"],
+input[type="checkbox"],
+input[type="radio"] {
+  cursor: url('/cursor-hand.svg') 11 2, pointer !important;
 }

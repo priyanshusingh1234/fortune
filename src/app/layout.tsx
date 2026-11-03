@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import AuthProvider from "@/components/AuthProvider";
 import FortuneNav from "@/components/FortuneNav";
+import HackClubFlag from "@/components/HackClubFlag";
+import RetroSoundProvider from "@/components/RetroSoundProvider";
 
 export const metadata: Metadata = {
   title: "Fortune 🥠 • Hack Club YSWS",
@@ -26,27 +28,17 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen bg-[#f7f1e1] text-[#181926] antialiased selection:bg-[#ec3750] selection:text-white">
         <AuthProvider>
-          {/* Hack Club Flag Ribbon */}
-          <a
-            href="https://hackclub.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hackclub-flag"
-            title="Part of Hack Club"
-          >
-            <img
-              src="https://assets.hackclub.com/flag-orpheus-top.svg"
-              alt="Hack Club Flag"
-              className="w-full h-auto drop-shadow-md hover:translate-y-1 transition-transform"
-            />
-          </a>
+          <RetroSoundProvider>
+            {/* Hack Club Flag Ribbon (auto-hidden in fullscreen PC mode) */}
+            <HackClubFlag />
 
-          {/* Persistent Retro Top Navbar */}
-          <FortuneNav />
+            {/* Persistent Retro Top Navbar */}
+            <FortuneNav />
 
-          <div className="pt-12">
-            {children}
-          </div>
+            <div>
+              {children}
+            </div>
+          </RetroSoundProvider>
         </AuthProvider>
       </body>
     </html>

@@ -6,7 +6,7 @@ import HackClubFlag from "@/components/HackClubFlag";
 import RetroSoundProvider from "@/components/RetroSoundProvider";
 
 export const metadata: Metadata = {
-  title: "Fortune 🥠 • Hack Club YSWS",
+  title: "Fortune • Hack Club YSWS",
   description: "Code software, get seed funded, build a real business. A Hack Club You Ship, We Ship for teen founders.",
 };
 

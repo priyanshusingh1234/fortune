@@ -7,6 +7,27 @@ import confetti from "canvas-confetti";
 import { isUserAdmin } from "@/lib/admin";
 import { FORTUNE_FAQS } from "@/components/FortuneFaq";
 import StartupCalculator from "@/components/StartupCalculator";
+import {
+  Shield,
+  LayoutDashboard,
+  Power,
+  LogIn,
+  MessageSquare,
+  Package,
+  Map,
+  ShoppingBag,
+  HelpCircle,
+  ExternalLink,
+  Terminal,
+  Trophy,
+  Check,
+  Clock,
+  ChevronUp,
+  ChevronDown,
+  X,
+  Cpu,
+  Sparkles,
+} from "lucide-react";
 
 interface RetroComputerHeroProps {
   fullscreen?: boolean;
@@ -159,18 +180,18 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
         <div className="flex flex-wrap items-center justify-between gap-3 mb-6 font-pixel text-xs">
           <div className="flex items-center gap-2">
             <span className="bg-[#ec3750] text-white px-3 py-1 rounded-full border-2 border-[#181926] shadow-[2px_2px_0px_#181926] font-bold">
-              ★ HACK CLUB YSWS
+              HACK CLUB YSWS
             </span>
             <span className="bg-white px-3 py-1 rounded-full border-2 border-[#181926] shadow-[2px_2px_0px_#181926] text-[#b45309] font-bold">
-              👑 Org: @Noben_Nobi
+              Org: @Noben_Nobi
             </span>
             <span className="bg-white px-3 py-1 rounded-full border-2 border-[#181926] shadow-[2px_2px_0px_#181926] text-[#15803d] font-bold">
-              🤝 Co-Org: @itsnotketan
+              Co-Org: @itsnotketan
             </span>
           </div>
 
           <div className="bg-white px-3 py-1 rounded-full border-2 border-[#181926] shadow-[2px_2px_0px_#181926] text-[#ec3750] font-bold">
-            🛠️ Lead Dev: Priyanshu Singh
+            Lead Dev: Priyanshu Singh
           </div>
         </div>
       )}
@@ -201,19 +222,21 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
               {isAdmin && (
                 <Link
                   href="/admin"
-                  className="bg-[#181926] text-white px-2 py-0.5 rounded border border-[#ec3750] text-[10px] font-bold hover:bg-[#333]"
+                  className="bg-[#181926] text-white px-2 py-0.5 rounded border border-[#ec3750] text-[10px] font-bold hover:bg-[#333] flex items-center gap-1"
                   title="Open Admin Panel (Restricted to U0BTDMCJ6P7)"
                 >
-                  🛡️ Admin
+                  <Shield className="w-3 h-3 text-[#ffe066]" />
+                  <span>Admin</span>
                 </Link>
               )}
               {session?.user && (
                 <Link
                   href="/dashboard"
-                  className="bg-[#ffe066] text-[#181926] px-2 py-0.5 rounded border border-[#181926] text-[10px] font-bold hover:bg-[#ffd533]"
+                  className="bg-[#ffe066] text-[#181926] px-2 py-0.5 rounded border border-[#181926] text-[10px] font-bold hover:bg-[#ffd533] flex items-center gap-1"
                   title="Open Founder Dashboard"
                 >
-                  ⚡ Dashboard
+                  <LayoutDashboard className="w-3 h-3" />
+                  <span>Dashboard</span>
                 </Link>
               )}
 
@@ -263,9 +286,11 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
 
                 <div className="relative z-10 max-w-lg space-y-6">
                   
-                  {/* Fortune Logo Icon */}
+                  {/* Fortune Logo Badge */}
                   <div className="inline-block relative">
-                    <span className="text-6xl sm:text-7xl block animate-pulse">🥠</span>
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-[#ffe066] border-3 border-white shadow-[4px_4px_0px_#000] flex items-center justify-center text-[#181926] mx-auto animate-pulse">
+                      <Terminal className="w-9 h-9 sm:w-11 sm:h-11" />
+                    </div>
                     <span className="absolute -top-2 -right-2 bg-[#ec3750] text-white text-[10px] font-pixel px-2 py-0.5 rounded-full border border-white">
                       YSWS
                     </span>
@@ -288,7 +313,7 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                         onClick={handlePowerOn}
                         className="bg-[#10b981] hover:bg-[#059669] text-white font-pixel text-sm sm:text-base font-bold py-3.5 px-6 rounded-xl border-2 border-white shadow-[4px_4px_0px_#000] transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
                       >
-                        <span>⚡</span>
+                        <Power className="w-4 h-4" />
                         <span>Launch Workstation (Boot OS)</span>
                       </button>
                     ) : (
@@ -296,20 +321,20 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                         onClick={() => signIn("hackclub")}
                         className="bg-[#ec3750] hover:bg-[#d6253e] text-white font-pixel text-sm sm:text-base font-bold py-3.5 px-6 rounded-xl border-2 border-white shadow-[4px_4px_0px_#000] transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
                       >
-                        <span>🚀</span>
+                        <LogIn className="w-4 h-4" />
                         <span>Connect Slack to Boot</span>
                       </button>
                     )}
 
-                    {/* RSVP Button */}
+                    {/* Slack Channel Button */}
                     <a
-                      href="https://rsvp.hackclub.community/fortune-ysws"
+                      href="https://hackclub.slack.com/messages/fortune"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="bg-[#ffe066] hover:bg-[#ffd533] text-[#181926] font-pixel text-sm sm:text-base font-bold py-3.5 px-6 rounded-xl border-2 border-white shadow-[4px_4px_0px_#000] transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
                     >
-                      <span>🥠</span>
-                      <span>RSVP for Fortune</span>
+                      <MessageSquare className="w-4 h-4" />
+                      <span>Join #fortune</span>
                     </a>
                   </div>
                 </div>
@@ -331,7 +356,9 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                 
                 {/* Glowing Boot Screen */}
                 <div className="space-y-6 max-w-sm">
-                  <div className="text-6xl animate-bounce">🥠</div>
+                  <div className="w-16 h-16 rounded-xl bg-[#ffe066] border-2 border-white flex items-center justify-center text-[#181926] mx-auto animate-bounce shadow-lg">
+                    <Cpu className="w-8 h-8" />
+                  </div>
                   
                   <div className="space-y-2">
                     <h2 className="font-pixel text-2xl text-[#ffe066]">
@@ -411,11 +438,11 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                         <span>STATUS:</span>
                         {isApproved ? (
                           <span className="text-[#10b981] font-bold flex items-center gap-1">
-                            <span>✓</span> APPROVED &amp; FUNDED
+                            <Check className="w-3 h-3" /> APPROVED &amp; FUNDED
                           </span>
                         ) : hasShipped ? (
                           <span className="text-[#b45309] font-bold flex items-center gap-1">
-                            <span>⏳</span> AWAITING REVIEW
+                            <Clock className="w-3 h-3" /> AWAITING REVIEW
                           </span>
                         ) : (
                           <span className="text-gray-500 font-bold">
@@ -453,7 +480,7 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                               <div className="text-xs font-bold text-gray-400 font-mono leading-tight">
                                 NOT SHIPPED
                               </div>
-                              <div className="text-[8px] text-[#ec3750] font-mono">SHIP BELOW ↓</div>
+                              <div className="text-[8px] text-[#ec3750] font-mono">READY TO SHIP</div>
                             </>
                           )}
                         </div>
@@ -477,7 +504,7 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                             href="/dashboard"
                             className="text-[#10b981] font-bold hover:underline"
                           >
-                            [VIEW SHIP ↗]
+                            [VIEW SHIP]
                           </Link>
                           <button
                             onClick={() => signOut()}
@@ -499,8 +526,8 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                       onClick={() => setActiveWindow("ship")}
                       className="w-18 sm:w-20 flex flex-col items-center gap-1 cursor-pointer p-1.5 sm:p-2 rounded hover:bg-white/10 active:scale-95 transition-all text-white font-pixel text-[10px] sm:text-[11px] text-center"
                     >
-                      <div className="w-11 h-11 sm:w-12 sm:h-12 bg-[#ffe066] rounded-lg border-2 border-white flex items-center justify-center text-xl sm:text-2xl shadow-md">
-                        📦
+                      <div className="w-11 h-11 sm:w-12 sm:h-12 bg-[#ffe066] rounded-lg border-2 border-white flex items-center justify-center text-[#181926] shadow-md">
+                        <Package className="w-6 h-6" />
                       </div>
                       <span className="drop-shadow">Ship Project</span>
                     </div>
@@ -510,8 +537,8 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                       onClick={() => setActiveWindow("roadmap")}
                       className="w-18 sm:w-20 flex flex-col items-center gap-1 cursor-pointer p-1.5 sm:p-2 rounded hover:bg-white/10 active:scale-95 transition-all text-white font-pixel text-[10px] sm:text-[11px] text-center"
                     >
-                      <div className="w-11 h-11 sm:w-12 sm:h-12 bg-[#38a3a5] rounded-lg border-2 border-white flex items-center justify-center text-xl sm:text-2xl shadow-md">
-                        📜
+                      <div className="w-11 h-11 sm:w-12 sm:h-12 bg-[#38a3a5] rounded-lg border-2 border-white flex items-center justify-center text-white shadow-md">
+                        <Map className="w-6 h-6" />
                       </div>
                       <span className="drop-shadow">Roadmap</span>
                     </div>
@@ -521,8 +548,8 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                       onClick={() => setActiveWindow("shop")}
                       className="w-18 sm:w-20 flex flex-col items-center gap-1 cursor-pointer p-1.5 sm:p-2 rounded hover:bg-white/10 active:scale-95 transition-all text-white font-pixel text-[10px] sm:text-[11px] text-center"
                     >
-                      <div className="w-11 h-11 sm:w-12 sm:h-12 bg-[#ec3750] rounded-lg border-2 border-white flex items-center justify-center text-xl sm:text-2xl shadow-md">
-                        🛍️
+                      <div className="w-11 h-11 sm:w-12 sm:h-12 bg-[#ec3750] rounded-lg border-2 border-white flex items-center justify-center text-white shadow-md">
+                        <ShoppingBag className="w-6 h-6" />
                       </div>
                       <span className="drop-shadow">Shop</span>
                     </div>
@@ -532,8 +559,8 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                       onClick={() => setActiveWindow("chat")}
                       className="w-18 sm:w-20 flex flex-col items-center gap-1 cursor-pointer p-1.5 sm:p-2 rounded hover:bg-white/10 active:scale-95 transition-all text-white font-pixel text-[10px] sm:text-[11px] text-center"
                     >
-                      <div className="w-11 h-11 sm:w-12 sm:h-12 bg-[#57cc99] rounded-lg border-2 border-white flex items-center justify-center text-xl sm:text-2xl shadow-md">
-                        💬
+                      <div className="w-11 h-11 sm:w-12 sm:h-12 bg-[#57cc99] rounded-lg border-2 border-white flex items-center justify-center text-[#181926] shadow-md">
+                        <MessageSquare className="w-6 h-6" />
                       </div>
                       <span className="drop-shadow">Discuss</span>
                     </div>
@@ -543,8 +570,8 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                       onClick={() => setActiveWindow("faq")}
                       className="w-18 sm:w-20 flex flex-col items-center gap-1 cursor-pointer p-1.5 sm:p-2 rounded hover:bg-white/10 active:scale-95 transition-all text-white font-pixel text-[10px] sm:text-[11px] text-center"
                     >
-                      <div className="w-11 h-11 sm:w-12 sm:h-12 bg-[#ffffff] text-[#181926] rounded-lg border-2 border-[#181926] flex items-center justify-center text-xl sm:text-2xl shadow-md">
-                        ❓
+                      <div className="w-11 h-11 sm:w-12 sm:h-12 bg-[#ffffff] text-[#181926] rounded-lg border-2 border-[#181926] flex items-center justify-center shadow-md">
+                        <HelpCircle className="w-6 h-6" />
                       </div>
                       <span className="drop-shadow">FAQ</span>
                     </div>
@@ -554,8 +581,8 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                       href="/dashboard"
                       className="w-18 sm:w-20 flex flex-col items-center gap-1 cursor-pointer p-1.5 sm:p-2 rounded hover:bg-white/10 active:scale-95 transition-all text-white font-pixel text-[10px] sm:text-[11px] text-center"
                     >
-                      <div className="w-11 h-11 sm:w-12 sm:h-12 bg-[#ffe066] text-[#181926] rounded-lg border-2 border-white flex items-center justify-center text-xl sm:text-2xl shadow-md">
-                        ⚡
+                      <div className="w-11 h-11 sm:w-12 sm:h-12 bg-[#ffe066] text-[#181926] rounded-lg border-2 border-white flex items-center justify-center shadow-md">
+                        <LayoutDashboard className="w-6 h-6" />
                       </div>
                       <span className="drop-shadow">Dashboard</span>
                     </Link>
@@ -566,8 +593,8 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                         href="/admin"
                         className="w-18 sm:w-20 flex flex-col items-center gap-1 cursor-pointer p-1.5 sm:p-2 rounded hover:bg-white/10 active:scale-95 transition-all text-white font-pixel text-[10px] sm:text-[11px] text-center"
                       >
-                        <div className="w-11 h-11 sm:w-12 sm:h-12 bg-[#181926] text-white rounded-lg border-2 border-[#ec3750] flex items-center justify-center text-xl sm:text-2xl shadow-md">
-                          🛡️
+                        <div className="w-11 h-11 sm:w-12 sm:h-12 bg-[#181926] text-white rounded-lg border-2 border-[#ec3750] flex items-center justify-center shadow-md">
+                          <Shield className="w-6 h-6 text-[#ffe066]" />
                         </div>
                         <span className="drop-shadow text-[#ffe066]">Admin</span>
                       </Link>
@@ -585,19 +612,19 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                     <div className="bg-[#181926] text-white px-3 py-2 flex items-center justify-between font-pixel text-xs shrink-0 select-none">
                       <div className="flex items-center gap-2">
                         <span className="w-3 h-3 rounded-full bg-[#ec3750] inline-block"></span>
-                        <span className="font-bold uppercase tracking-wide">
-                          {activeWindow === "ship" && "📦 SHIP_SUBMISSION_APP.EXE"}
-                          {activeWindow === "shop" && "🛍️ FORTUNE_REWARDS_SHOP.EXE"}
-                          {activeWindow === "chat" && "💬 FOUNDER_SLACK_CHAT.EXE"}
-                          {activeWindow === "roadmap" && "📜 SPRINT_QUEST_MAP.EXE"}
-                          {activeWindow === "faq" && "❓ FREQUENTLY_ASKED_QUESTIONS.TXT"}
+                        <span className="font-bold uppercase tracking-wide flex items-center gap-1.5">
+                          {activeWindow === "ship" && <><Package className="w-3.5 h-3.5 text-[#ffe066]" /> SHIP_SUBMISSION_APP.EXE</>}
+                          {activeWindow === "shop" && <><ShoppingBag className="w-3.5 h-3.5 text-[#ffe066]" /> FORTUNE_REWARDS_SHOP.EXE</>}
+                          {activeWindow === "chat" && <><MessageSquare className="w-3.5 h-3.5 text-[#ffe066]" /> FOUNDER_SLACK_CHAT.EXE</>}
+                          {activeWindow === "roadmap" && <><Map className="w-3.5 h-3.5 text-[#ffe066]" /> SPRINT_QUEST_MAP.EXE</>}
+                          {activeWindow === "faq" && <><HelpCircle className="w-3.5 h-3.5 text-[#ffe066]" /> FREQUENTLY_ASKED_QUESTIONS.TXT</>}
                         </span>
                       </div>
                       <button
                         onClick={() => setActiveWindow(null)}
                         className="bg-[#ec3750] hover:bg-[#d6253e] text-white px-2.5 py-0.5 rounded font-bold transition-colors"
                       >
-                        ✕ CLOSE
+                        CLOSE [X]
                       </button>
                     </div>
 
@@ -607,7 +634,9 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                       {/* WINDOW: SHIP PROJECT */}
                       {activeWindow === "ship" && (
                         <div className="space-y-4 max-w-lg mx-auto text-center py-4">
-                          <span className="text-5xl block animate-bounce">📦</span>
+                          <div className="w-16 h-16 rounded-2xl bg-[#ffe066] border-2 border-[#181926] flex items-center justify-center text-[#181926] mx-auto shadow-md">
+                            <Package className="w-8 h-8" />
+                          </div>
                           <h3 className="font-sans font-black text-2xl sm:text-3xl">Ready to ship to Step 1 Review?</h3>
                           <p className="font-doodle text-sm sm:text-base text-gray-600">
                             Our review team (@Noben_Nobi &amp; organizers) checks your working demo and opens your $100 HCB seed grant.
@@ -615,9 +644,10 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                           <div className="pt-2">
                             <Link
                               href="/dashboard"
-                              className="fortune-btn fortune-btn-gold text-sm block text-center py-3.5 shadow-[4px_4px_0px_#181926]"
+                              className="fortune-btn fortune-btn-gold text-sm flex items-center justify-center gap-2 py-3.5 shadow-[4px_4px_0px_#181926]"
                             >
-                              🚀 Open Founder Shipping Dashboard ↗
+                              <ExternalLink className="w-4 h-4" />
+                              <span>Open Founder Shipping Dashboard</span>
                             </Link>
                           </div>
                         </div>
@@ -628,15 +658,16 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                         <div className="space-y-4">
                           <div className="text-center border-b-2 border-dashed border-[#181926]/20 pb-3">
                             <h3 className="font-sans font-black text-2xl sm:text-3xl text-[#181926] flex items-center justify-center gap-2">
-                              <span>🛍️</span> Fortune Hardware &amp; Rewards Store
+                              <ShoppingBag className="w-7 h-7 text-[#ec3750]" />
+                              <span>Fortune Hardware &amp; Rewards Store</span>
                             </h3>
                             <p className="font-doodle text-sm sm:text-base text-gray-600 mt-1">
                               Convert verified startup revenue into Fortune Points or win Top 5 Demo Day grand prizes!
                             </p>
                             <div className="inline-flex items-center gap-2 mt-2 bg-[#ffe066] border border-[#181926] px-3 py-1 rounded-full font-pixel text-[11px] font-bold text-[#181926]">
-                              <span>⚡ $1 Revenue = 10 Fortune Points</span>
+                              <span>$1 Revenue = 10 Fortune Points</span>
                               <span>•</span>
-                              <span>📦 Free Worldwide Shipping via Hack Club</span>
+                              <span>Free Worldwide Shipping via Hack Club</span>
                             </div>
                           </div>
 
@@ -648,7 +679,7 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                               <div>
                                 <div className="flex items-center justify-between text-[10px] font-pixel mb-1">
                                   <span className="bg-[#fee2e2] text-[#ec3750] border border-[#ec3750]/30 px-1.5 py-0.5 rounded font-bold">
-                                    🖨️ Grand Hardware
+                                    Grand Hardware
                                   </span>
                                   <span className="font-mono text-gray-500">$950+ Rev</span>
                                 </div>
@@ -679,7 +710,7 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                               <div>
                                 <div className="flex items-center justify-between text-[10px] font-pixel mb-1">
                                   <span className="bg-[#e0e7ff] text-[#4338ca] border border-[#4338ca]/30 px-1.5 py-0.5 rounded font-bold">
-                                    🎧 Pro Audio
+                                    Pro Audio
                                   </span>
                                   <span className="font-mono text-gray-500">$750 Rev</span>
                                 </div>
@@ -710,7 +741,7 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                               <div>
                                 <div className="flex items-center justify-between text-[10px] font-pixel mb-1">
                                   <span className="bg-[#fef3c7] text-[#b45309] border border-[#b45309]/30 px-1.5 py-0.5 rounded font-bold">
-                                    ⌨️ Hardware Swag
+                                    Hardware Swag
                                   </span>
                                   <span className="font-mono text-gray-500">$400 Rev</span>
                                 </div>
@@ -741,7 +772,7 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                               <div>
                                 <div className="flex items-center justify-between text-[10px] font-pixel mb-1">
                                   <span className="bg-[#fef3c7] text-[#b45309] border border-[#b45309]/30 px-1.5 py-0.5 rounded font-bold">
-                                    👕 Custom Apparel
+                                    Custom Apparel
                                   </span>
                                   <span className="font-mono text-gray-500">$100 Rev</span>
                                 </div>
@@ -772,12 +803,12 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                               <div>
                                 <div className="flex items-center justify-between text-[10px] font-pixel mb-1">
                                   <span className="bg-[#fee2e2] text-[#991b1b] border border-[#991b1b]/30 px-1.5 py-0.5 rounded font-bold">
-                                    🍓 Dev Kit
+                                    Dev Kit
                                   </span>
                                   <span className="font-mono text-gray-500">$250 Rev</span>
                                 </div>
-                                <div className="h-32 w-full bg-white border border-[#181926]/15 rounded-lg p-2 flex items-center justify-center my-1 shadow-inner text-5xl">
-                                  🍓
+                                <div className="h-32 w-full bg-white border border-[#181926]/15 rounded-lg p-2 flex items-center justify-center my-1 shadow-inner text-[#991b1b]">
+                                  <Cpu className="w-12 h-12" />
                                 </div>
                                 <h4 className="font-black text-sm text-[#181926] leading-tight">
                                   Raspberry Pi 5 (8GB) Kit
@@ -799,12 +830,12 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                               <div>
                                 <div className="flex items-center justify-between text-[10px] font-pixel mb-1">
                                   <span className="bg-[#dcfce7] text-[#15803d] border border-[#15803d]/30 px-1.5 py-0.5 rounded font-bold">
-                                    ✨ Base Loot
+                                    Base Loot
                                   </span>
                                   <span className="font-mono text-gray-500">Free Ship</span>
                                 </div>
-                                <div className="h-32 w-full bg-white border border-[#181926]/15 rounded-lg p-2 flex items-center justify-center my-1 shadow-inner text-5xl">
-                                  🥠
+                                <div className="h-32 w-full bg-white border border-[#181926]/15 rounded-lg p-2 flex items-center justify-center my-1 shadow-inner text-[#15803d]">
+                                  <Sparkles className="w-12 h-12" />
                                 </div>
                                 <h4 className="font-black text-sm text-[#181926] leading-tight">
                                   Die-Cut Sticker Pack &amp; Pass
@@ -826,7 +857,9 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                           {/* Top 5 Grand Prize Banner */}
                           <div className="bg-white border-2 border-[#181926] rounded-xl p-4 shadow-[3px_3px_0px_#181926] text-left flex flex-col sm:flex-row items-center justify-between gap-3 mt-4">
                             <div className="flex items-center gap-3">
-                              <span className="text-3xl">🏆</span>
+                              <div className="w-10 h-10 rounded-xl bg-[#ffe066] border-2 border-[#181926] flex items-center justify-center text-[#181926]">
+                                <Trophy className="w-6 h-6" />
+                              </div>
                               <div>
                                 <h4 className="font-sans font-black text-base text-[#181926]">
                                   Top 5 Demo Day Grand Prizes
@@ -838,9 +871,10 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                             </div>
                             <Link
                               href="/dashboard"
-                              className="fortune-btn fortune-btn-gold text-xs py-2 px-4 whitespace-nowrap text-center"
+                              className="fortune-btn fortune-btn-gold text-xs py-2 px-4 whitespace-nowrap text-center flex items-center gap-1.5"
                             >
-                              🚀 Ship Project
+                              <Package className="w-3.5 h-3.5" />
+                              <span>Ship Project</span>
                             </Link>
                           </div>
                         </div>
@@ -850,8 +884,9 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                       {activeWindow === "roadmap" && (
                         <div className="space-y-6 max-w-4xl mx-auto py-2">
                           <div className="text-center border-b-2 border-dashed border-[#181926]/20 pb-3">
-                            <span className="font-pixel text-xs bg-[#38a3a5] text-white px-3 py-1 rounded border border-[#181926] inline-block mb-1">
-                              THE SPRINT ROADMAP 📜
+                            <span className="font-pixel text-xs bg-[#38a3a5] text-white px-3 py-1 rounded border border-[#181926] inline-flex items-center gap-1.5 mb-1 font-bold">
+                              <Map className="w-3.5 h-3.5" />
+                              <span>THE SPRINT ROADMAP</span>
                             </span>
                             <h3 className="font-sans font-black text-2xl sm:text-3xl text-[#181926]">
                               How Fortune Works from 0 to 1
@@ -911,7 +946,8 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-2 border-dashed border-[#181926]/20 pb-3">
                             <div>
                               <h3 className="font-sans font-black text-2xl text-[#181926] flex items-center gap-2">
-                                <span>❓</span> Fortune FAQ &amp; Rules
+                                <HelpCircle className="w-6 h-6 text-[#ec3750]" />
+                                <span>Fortune FAQ &amp; Rules</span>
                               </h3>
                               <p className="font-doodle text-xs text-gray-600 mt-0.5">
                                 Everything you need to know about seed grants, Hackatime, shipping &amp; loot.
@@ -930,7 +966,7 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                                   onClick={() => setFaqSearch("")}
                                   className="absolute right-2 top-1.5 text-xs text-gray-500 font-bold hover:text-black"
                                 >
-                                  ✕
+                                  <X className="w-3.5 h-3.5" />
                                 </button>
                               )}
                             </div>
@@ -953,7 +989,11 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                                       <span className="text-[10px] font-pixel bg-[#181926] text-white px-1.5 py-0.5 rounded">Q{i + 1}</span>
                                       <span>{faq.q}</span>
                                     </span>
-                                    <span className="font-pixel text-xs text-[#ec3750]">{isOpen ? "▲" : "▼"}</span>
+                                    {isOpen ? (
+                                      <ChevronUp className="w-4 h-4 text-[#ec3750]" />
+                                    ) : (
+                                      <ChevronDown className="w-4 h-4 text-[#ec3750]" />
+                                    )}
                                   </button>
                                   {isOpen && (
                                     <div className="p-3 pt-0 border-t border-[#181926]/10 text-xs text-[#3a3d52] font-medium leading-relaxed bg-white">
@@ -982,7 +1022,9 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                       {/* WINDOW: SLACK DISCUSSION */}
                       {activeWindow === "chat" && (
                         <div className="space-y-4 text-center max-w-md mx-auto py-4">
-                          <span className="text-5xl block animate-pulse">💬</span>
+                          <div className="w-16 h-16 rounded-2xl bg-[#57cc99] border-2 border-[#181926] flex items-center justify-center text-white mx-auto shadow-md">
+                            <MessageSquare className="w-8 h-8" />
+                          </div>
                           <h3 className="font-sans font-black text-2xl">Founder Discussion Channels</h3>
                           <p className="font-doodle text-sm text-gray-600">
                             Hang out, brainstorm startup mechanics, share daily commits, and get help from organizers!
@@ -1022,7 +1064,7 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                         onClick={() => setStartMenuOpen(!startMenuOpen)}
                         className="bg-[#ffe066] hover:bg-[#ffd533] text-[#181926] px-3 py-1 rounded font-bold flex items-center gap-1.5 shadow-[1px_1px_0px_#000] active:scale-95 transition-transform"
                       >
-                        <span>🥠</span>
+                        <Terminal className="w-3.5 h-3.5" />
                         <span>Start</span>
                       </button>
 
@@ -1039,31 +1081,31 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                               onClick={() => { setActiveWindow("ship"); setStartMenuOpen(false); }}
                               className="w-full text-left p-1.5 rounded hover:bg-[#ffe066] flex items-center gap-2"
                             >
-                              <span>📦</span> <span>Ship Project</span>
+                              <Package className="w-3.5 h-3.5" /> <span>Ship Project</span>
                             </button>
                             <button
                               onClick={() => { setActiveWindow("roadmap"); setStartMenuOpen(false); }}
                               className="w-full text-left p-1.5 rounded hover:bg-[#ffe066] flex items-center gap-2"
                             >
-                              <span>📜</span> <span>Roadmap &amp; Calculator</span>
+                              <Map className="w-3.5 h-3.5" /> <span>Roadmap &amp; Calculator</span>
                             </button>
                             <button
                               onClick={() => { setActiveWindow("shop"); setStartMenuOpen(false); }}
                               className="w-full text-left p-1.5 rounded hover:bg-[#ffe066] flex items-center gap-2"
                             >
-                              <span>🛍️</span> <span>Rewards Shop</span>
+                              <ShoppingBag className="w-3.5 h-3.5" /> <span>Rewards Shop</span>
                             </button>
                             <button
                               onClick={() => { setActiveWindow("chat"); setStartMenuOpen(false); }}
                               className="w-full text-left p-1.5 rounded hover:bg-[#ffe066] flex items-center gap-2"
                             >
-                              <span>💬</span> <span>Slack Discussion</span>
+                              <MessageSquare className="w-3.5 h-3.5" /> <span>Slack Discussion</span>
                             </button>
                             <button
                               onClick={() => { setActiveWindow("faq"); setStartMenuOpen(false); }}
                               className="w-full text-left p-1.5 rounded hover:bg-[#ffe066] flex items-center gap-2"
                             >
-                              <span>❓</span> <span>FAQ &amp; Rules</span>
+                              <HelpCircle className="w-3.5 h-3.5" /> <span>FAQ &amp; Rules</span>
                             </button>
                             
                             <div className="border-t border-[#181926]/20 my-1 pt-1">
@@ -1072,7 +1114,7 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                                 onClick={() => setStartMenuOpen(false)}
                                 className="w-full text-left p-1.5 rounded hover:bg-[#ffe066] flex items-center gap-2 block"
                               >
-                                <span>⚡</span> <span>Founder Dashboard</span>
+                                <LayoutDashboard className="w-3.5 h-3.5" /> <span>Founder Dashboard</span>
                               </Link>
                               {isAdmin && (
                                 <Link
@@ -1080,7 +1122,7 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                                   onClick={() => setStartMenuOpen(false)}
                                   className="w-full text-left p-1.5 rounded hover:bg-[#ffe066] flex items-center gap-2 block text-[#ec3750] font-bold"
                                 >
-                                  <span>🛡️</span> <span>Admin Panel</span>
+                                  <Shield className="w-3.5 h-3.5" /> <span>Admin Panel</span>
                                 </Link>
                               )}
                             </div>
@@ -1090,7 +1132,7 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                                 onClick={() => signOut()}
                                 className="w-full text-left p-1.5 rounded hover:bg-[#fee2e2] text-[#ec3750] flex items-center gap-2 font-bold"
                               >
-                                <span>🚪</span> <span>Sign Out</span>
+                                <Power className="w-3.5 h-3.5" /> <span>Sign Out</span>
                               </button>
                             </div>
                           </div>
@@ -1102,43 +1144,48 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                     <div className="hidden sm:flex items-center gap-1.5 pl-2 border-l border-gray-700">
                       <button
                         onClick={() => setActiveWindow(activeWindow === "ship" ? null : "ship")}
-                        className={`px-2 py-0.5 rounded text-[11px] transition-colors ${
+                        className={`px-2 py-0.5 rounded text-[11px] transition-colors flex items-center gap-1 ${
                           activeWindow === "ship" ? "bg-[#ffe066] text-[#181926] font-bold" : "hover:bg-gray-800 text-gray-300"
                         }`}
                       >
-                        📦 Ship
+                        <Package className="w-3 h-3" />
+                        <span>Ship</span>
                       </button>
                       <button
                         onClick={() => setActiveWindow(activeWindow === "roadmap" ? null : "roadmap")}
-                        className={`px-2 py-0.5 rounded text-[11px] transition-colors ${
+                        className={`px-2 py-0.5 rounded text-[11px] transition-colors flex items-center gap-1 ${
                           activeWindow === "roadmap" ? "bg-[#ffe066] text-[#181926] font-bold" : "hover:bg-gray-800 text-gray-300"
                         }`}
                       >
-                        📜 Roadmap
+                        <Map className="w-3 h-3" />
+                        <span>Roadmap</span>
                       </button>
                       <button
                         onClick={() => setActiveWindow(activeWindow === "shop" ? null : "shop")}
-                        className={`px-2 py-0.5 rounded text-[11px] transition-colors ${
+                        className={`px-2 py-0.5 rounded text-[11px] transition-colors flex items-center gap-1 ${
                           activeWindow === "shop" ? "bg-[#ffe066] text-[#181926] font-bold" : "hover:bg-gray-800 text-gray-300"
                         }`}
                       >
-                        🛍️ Shop
+                        <ShoppingBag className="w-3 h-3" />
+                        <span>Shop</span>
                       </button>
                       <button
                         onClick={() => setActiveWindow(activeWindow === "chat" ? null : "chat")}
-                        className={`px-2 py-0.5 rounded text-[11px] transition-colors ${
+                        className={`px-2 py-0.5 rounded text-[11px] transition-colors flex items-center gap-1 ${
                           activeWindow === "chat" ? "bg-[#ffe066] text-[#181926] font-bold" : "hover:bg-gray-800 text-gray-300"
                         }`}
                       >
-                        💬 Discuss
+                        <MessageSquare className="w-3 h-3" />
+                        <span>Discuss</span>
                       </button>
                       <button
                         onClick={() => setActiveWindow(activeWindow === "faq" ? null : "faq")}
-                        className={`px-2 py-0.5 rounded text-[11px] transition-colors ${
+                        className={`px-2 py-0.5 rounded text-[11px] transition-colors flex items-center gap-1 ${
                           activeWindow === "faq" ? "bg-[#ffe066] text-[#181926] font-bold" : "hover:bg-gray-800 text-gray-300"
                         }`}
                       >
-                        ❓ FAQ
+                        <HelpCircle className="w-3 h-3" />
+                        <span>FAQ</span>
                       </button>
                     </div>
                   </div>
@@ -1178,7 +1225,8 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
         {!fullscreen && scrollPrompt && (
           <div className="flex flex-col items-center justify-center mt-6 animate-bounce transition-all">
             <div className="bg-[#ffe066] text-[#181926] px-4 py-2 rounded-full border-3 border-[#181926] shadow-[4px_4px_0px_#181926] font-pixel text-xs sm:text-sm font-bold flex items-center gap-2">
-              <span>📜 Scrolling down to {scrollPrompt}</span>
+              <Map className="w-4 h-4" />
+              <span>Scrolling down to {scrollPrompt}</span>
               <span className="text-lg">↓</span>
             </div>
             <div className="text-4xl text-[#ec3750] font-black -mt-1 select-none">

@@ -5,6 +5,15 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { isUserAdmin } from "@/lib/admin";
+import {
+  Coins,
+  Home,
+  Map,
+  HelpCircle,
+  LayoutDashboard,
+  Shield,
+  LogIn,
+} from "lucide-react";
 
 export default function FortuneNav() {
   const { data: session, status } = useSession();
@@ -22,7 +31,9 @@ export default function FortuneNav() {
         
         {/* Brand / Logo */}
         <Link href="/" className="flex items-center gap-2 group">
-          <span className="text-2xl group-hover:scale-110 transition-transform inline-block">🥠</span>
+          <div className="w-7 h-7 rounded-lg bg-[#ffe066] border-2 border-[#181926] shadow-[2px_2px_0px_#181926] flex items-center justify-center text-[#181926] group-hover:scale-110 transition-transform">
+            <Coins className="w-4 h-4" />
+          </div>
           <span className="font-pixel text-base sm:text-lg font-bold text-[#181926]">
             Fortune <span className="text-[#ec3750] text-xs">YSWS</span>
           </span>
@@ -30,14 +41,17 @@ export default function FortuneNav() {
 
         {/* Center: Navigation links & centered Sign in / Dashboard */}
         <div className="flex items-center gap-4 sm:gap-6 font-pixel text-xs">
-          <Link href="/" className="hover:text-[#ec3750] transition-colors hidden sm:inline-block">
-            🏠 Home
+          <Link href="/" className="hover:text-[#ec3750] transition-colors hidden sm:flex items-center gap-1.5">
+            <Home className="w-3.5 h-3.5" />
+            <span>Home</span>
           </Link>
-          <Link href="/#quest" className="hover:text-[#ec3750] transition-colors hidden sm:inline-block">
-            📜 Roadmap
+          <Link href="/#quest" className="hover:text-[#ec3750] transition-colors hidden sm:flex items-center gap-1.5">
+            <Map className="w-3.5 h-3.5" />
+            <span>Roadmap</span>
           </Link>
-          <Link href="/#faq" className="hover:text-[#ec3750] transition-colors hidden sm:inline-block">
-            ❓ FAQ
+          <Link href="/#faq" className="hover:text-[#ec3750] transition-colors hidden sm:flex items-center gap-1.5">
+            <HelpCircle className="w-3.5 h-3.5" />
+            <span>FAQ</span>
           </Link>
 
           {/* Centered Auth CTA */}
@@ -49,16 +63,18 @@ export default function FortuneNav() {
             <div className="flex items-center gap-2">
               <Link
                 href="/dashboard"
-                className="bg-[#ffe066] hover:bg-[#ffd533] text-[#181926] px-3.5 py-1.5 rounded-md border-2 border-[#181926] shadow-[2px_2px_0px_#181926] font-bold transition-transform hover:-translate-y-0.5"
+                className="bg-[#ffe066] hover:bg-[#ffd533] text-[#181926] px-3.5 py-1.5 rounded-md border-2 border-[#181926] shadow-[2px_2px_0px_#181926] font-bold transition-transform hover:-translate-y-0.5 flex items-center gap-1.5"
               >
-                ⚡ Dashboard
+                <LayoutDashboard className="w-3.5 h-3.5" />
+                <span>Dashboard</span>
               </Link>
               {isAdmin && (
                 <Link
                   href="/admin"
-                  className="bg-[#181926] text-white hover:bg-[#333] px-2.5 py-1.5 rounded-md border-2 border-[#181926] font-bold text-[11px] shadow-[2px_2px_0px_#ec3750]"
+                  className="bg-[#181926] text-white hover:bg-[#333] px-2.5 py-1.5 rounded-md border-2 border-[#181926] font-bold text-[11px] shadow-[2px_2px_0px_#ec3750] flex items-center gap-1.5"
                 >
-                  🛡️ Admin
+                  <Shield className="w-3.5 h-3.5 text-[#ffe066]" />
+                  <span>Admin</span>
                 </Link>
               )}
             </div>
@@ -67,7 +83,7 @@ export default function FortuneNav() {
               onClick={() => signIn("hackclub")}
               className="bg-[#ec3750] hover:bg-[#d6253e] text-white px-4 py-1.5 rounded-md border-2 border-[#181926] shadow-[2px_2px_0px_#181926] font-bold flex items-center gap-1.5 transition-transform hover:-translate-y-0.5 active:translate-y-0.5"
             >
-              <span>🚀</span>
+              <LogIn className="w-3.5 h-3.5" />
               <span>Sign in with Hack Club</span>
             </button>
           )}
@@ -106,4 +122,3 @@ export default function FortuneNav() {
     </nav>
   );
 }
-

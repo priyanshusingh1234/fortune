@@ -4,6 +4,26 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { isUserAdmin, ADMIN_SLACK_IDS } from "@/lib/admin";
+import {
+  Shield,
+  Lock,
+  LogIn,
+  AlertTriangle,
+  RefreshCw,
+  Package,
+  Home,
+  GitBranch,
+  Globe,
+  Check,
+  MessageSquare,
+  X,
+  Clock,
+  Trash2,
+  Edit3,
+  Save,
+  Search,
+  Inbox,
+} from "lucide-react";
 
 interface Submission {
   id: string;
@@ -27,38 +47,38 @@ interface Submission {
 
 const REJECTION_PRESETS = [
   {
-    label: "⏱️ Under 10 Hours",
+    label: "Under 10 Hours",
     text: "Submission has less than the minimum required 10 tracked coding hours on Hackatime.",
   },
   {
-    label: "🤖 Pure AI Generated",
+    label: "Pure AI Generated",
     text: "Codebase appears heavily AI-generated without sufficient authentic hand-written engineering or learning.",
   },
   {
-    label: "🌐 Broken Demo URL",
+    label: "Broken Demo URL",
     text: "The submitted live demo is not functional, requires login credentials, or is completely offline.",
   },
   {
-    label: "⚠️ Ineligible / Not Original",
+    label: "Ineligible / Not Original",
     text: "Project does not meet Hack Club Fortune criteria for an original technical product built by the founder.",
   },
 ];
 
 const CHANGES_PRESETS = [
   {
-    label: "⏱️ Log More Hours",
+    label: "Log More Hours",
     text: "Please log at least 10+ total coding hours on Hackatime before this can be approved for the seed grant.",
   },
   {
-    label: "🌐 Fix Demo Link",
+    label: "Fix Demo Link",
     text: "Your demo URL is currently inaccessible or broken. Please test your deployment and update the link.",
   },
   {
-    label: "🐙 Push Repo Commits",
+    label: "Push Repo Commits",
     text: "Please ensure your full source code and commit history are pushed to your public GitHub repo.",
   },
   {
-    label: "📸 Add Proof Screenshots",
+    label: "Add Proof Screenshots",
     text: "Please update your submission with clear screenshots showing the working project UI.",
   },
 ];
@@ -195,11 +215,15 @@ export default function AdminDashboardPage() {
 
     setReasonModal((prev) => ({ ...prev, isSubmitting: true, error: undefined }));
     const reviewerName = reviewerTag;
+    const activePass = passkey || (typeof window !== "undefined" ? sessionStorage.getItem("fortune_admin_pass") || "" : "");
 
     try {
       const res = await fetch("/api/admin/submissions", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(activePass ? { "x-admin-passkey": activePass } : {}),
+        },
         body: JSON.stringify({
           id: submissionId,
           status: targetStatus,
@@ -247,11 +271,15 @@ export default function AdminDashboardPage() {
   const handleUpdateStatus = async (submissionId: string, newStatus: string, customNote?: string) => {
     const reviewerName = reviewerTag;
     const finalNote = customNote !== undefined ? customNote : editingNotes[submissionId];
+    const activePass = passkey || (typeof window !== "undefined" ? sessionStorage.getItem("fortune_admin_pass") || "" : "");
 
     try {
       const res = await fetch("/api/admin/submissions", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(activePass ? { "x-admin-passkey": activePass } : {}),
+        },
         body: JSON.stringify({
           id: submissionId,
           status: newStatus,
@@ -283,11 +311,15 @@ export default function AdminDashboardPage() {
     setSavingNoteId(submissionId);
     const noteContent = editingNotes[submissionId] || "";
     const reviewerName = reviewerTag;
+    const activePass = passkey || (typeof window !== "undefined" ? sessionStorage.getItem("fortune_admin_pass") || "" : "");
 
     try {
       const res = await fetch("/api/admin/submissions", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(activePass ? { "x-admin-passkey": activePass } : {}),
+        },
         body: JSON.stringify({
           id: submissionId,
           adminNote: noteContent,
@@ -330,8 +362,9 @@ export default function AdminDashboardPage() {
   // Render Gate if not authorized
   if (status === "loading") {
     return (
-      <div className="min-h-screen bg-[#f7f1e1] flex items-center justify-center p-6 text-center text-[#181926] font-pixel text-sm">
-        Verifying admin authentication... ⏳
+      <div className="min-h-screen bg-[#f7f1e1] flex items-center justify-center p-6 text-center text-[#181926] font-pixel text-sm gap-2">
+        <Clock className="w-4 h-4 animate-spin text-[#ec3750]" />
+        <span>Verifying admin authentication...</span>
       </div>
     );
   }
@@ -341,7 +374,9 @@ export default function AdminDashboardPage() {
     return (
       <div className="min-h-screen bg-[#f7f1e1] flex items-center justify-center p-6 text-center text-[#181926]">
         <div className="wobbly-card bg-white p-8 max-w-md w-full border-2 border-[#181926] shadow-[6px_6px_0px_#181926] space-y-5">
-          <div className="text-5xl">🔐</div>
+          <div className="w-16 h-16 mx-auto bg-[#ffe066] border-2 border-[#181926] rounded-2xl flex items-center justify-center shadow-[3px_3px_0px_#181926]">
+            <Lock className="w-8 h-8 text-[#181926]" />
+          </div>
           <h1 className="text-2xl font-black font-sans">Fortune Organizer Terminal</h1>
           <p className="font-doodle text-sm text-[#4a4e66]">
             This terminal is restricted to authorized Hack Club Fortune administrators (Slack ID: <strong>U0BTDMCJ6P7</strong>). Please sign in with your Slack account.
@@ -350,9 +385,10 @@ export default function AdminDashboardPage() {
           <div className="pt-2">
             <button
               onClick={() => signIn("hackclub")}
-              className="fortune-btn fortune-btn-gold w-full text-sm py-2.5"
+              className="fortune-btn fortune-btn-gold w-full text-sm py-2.5 inline-flex items-center justify-center gap-2"
             >
-              🚀 Sign in with Hack Club
+              <LogIn className="w-4 h-4" />
+              <span>Sign in with Hack Club</span>
             </button>
           </div>
 
@@ -360,8 +396,9 @@ export default function AdminDashboardPage() {
             <span className="font-pixel text-[10px] text-gray-500 uppercase block">Or passkey emergency unlock:</span>
             <form onSubmit={handleUnlockWithPasskey} className="space-y-2">
               {passkeyError && (
-                <div className="bg-[#fee2e2] text-[#ec3750] border-2 border-[#ec3750] p-2.5 rounded font-pixel text-xs">
-                  ⚠️ {passkeyError}
+                <div className="bg-[#fee2e2] text-[#ec3750] border-2 border-[#ec3750] p-2.5 rounded font-pixel text-xs flex items-center gap-1.5">
+                  <AlertTriangle className="w-4 h-4 shrink-0" />
+                  <span>{passkeyError}</span>
                 </div>
               )}
               <div className="flex gap-2">
@@ -401,20 +438,54 @@ export default function AdminDashboardPage() {
     return (
       <div className="min-h-screen bg-[#f7f1e1] flex items-center justify-center p-6 text-center text-[#181926]">
         <div className="wobbly-card bg-white p-8 max-w-md w-full border-2 border-[#181926] shadow-[6px_6px_0px_#181926] space-y-5">
-          <div className="text-5xl">🛑</div>
+          <div className="w-16 h-16 mx-auto bg-[#fee2e2] border-2 border-[#ec3750] rounded-2xl flex items-center justify-center shadow-[3px_3px_0px_#181926]">
+            <AlertTriangle className="w-8 h-8 text-[#ec3750]" />
+          </div>
           <h1 className="text-2xl font-black font-sans text-[#ec3750]">Access Denied</h1>
           <p className="font-sans text-xs text-[#4a4e66]">
             Signed in as <strong>@{session.user.name || "user"}</strong> (Slack ID: <code className="bg-gray-100 px-1 py-0.5 rounded font-mono text-[#ec3750]">{candidateSlackId}</code>).
           </p>
-          <div className="bg-[#fee2e2] text-[#991b1b] border-2 border-[#ec3750] p-3 rounded font-pixel text-xs text-left">
-            ⛔ Only authorized organizer accounts (Slack ID: <strong>U0BTDMCJ6P7</strong>) have permissions to access the Fortune Review Terminal.
+          <div className="bg-[#fee2e2] text-[#991b1b] border-2 border-[#ec3750] p-3 rounded font-pixel text-xs text-left flex items-start gap-2">
+            <Lock className="w-4 h-4 shrink-0 text-[#ec3750] mt-0.5" />
+            <span>Only authorized organizer accounts (Slack ID: <strong>U0BTDMCJ6P7</strong>) have permissions to access the Fortune Review Terminal.</span>
           </div>
+
+          <div className="pt-2 border-t border-[#181926]/10 text-left space-y-2">
+            <span className="font-pixel text-[10px] text-gray-500 uppercase block">Or passkey emergency unlock:</span>
+            <form onSubmit={handleUnlockWithPasskey} className="space-y-2">
+              {passkeyError && (
+                <div className="bg-[#fee2e2] text-[#ec3750] border-2 border-[#ec3750] p-2.5 rounded font-pixel text-xs flex items-center gap-1.5">
+                  <AlertTriangle className="w-4 h-4 shrink-0" />
+                  <span>{passkeyError}</span>
+                </div>
+              )}
+              <div className="flex gap-2">
+                <input
+                  type="password"
+                  placeholder="Passkey..."
+                  value={passkey}
+                  onChange={(e) => {
+                    setPasskey(e.target.value);
+                    setPasskeyError("");
+                  }}
+                  className="w-full p-2.5 bg-[#faf9f5] border-2 border-[#181926] rounded text-xs font-mono outline-none text-center"
+                />
+                <button
+                  type="submit"
+                  className="bg-[#181926] text-white px-3 py-2 rounded font-pixel text-xs hover:bg-[#333]"
+                >
+                  Unlock
+                </button>
+              </div>
+            </form>
+          </div>
+
           <div className="flex flex-col gap-2 pt-2 font-pixel text-xs">
             <Link
               href="/dashboard"
               className="fortune-btn fortune-btn-gold w-full text-center py-2"
             >
-              ⚡ Return to Founder Dashboard
+              Return to Founder Dashboard
             </Link>
             <button
               onClick={() => signOut()}
@@ -441,14 +512,14 @@ export default function AdminDashboardPage() {
         <div className="wobbly-card bg-white p-6 border-2 border-[#181926] shadow-[4px_4px_0px_#181926] flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-3xl">🛡️</span>
+              <Shield className="w-8 h-8 text-[#181926]" />
               <h1 className="text-2xl sm:text-3xl font-black text-[#181926]">
                 Fortune Admin &amp; Review Dashboard
               </h1>
             </div>
             <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-              <span className="bg-[#e6f4ea] text-[#137333] border border-[#137333] px-2.5 py-0.5 rounded font-pixel text-[11px] font-bold">
-                ✓ Verified Admin: @{session?.user?.name || "Organizer"} ({userSlackId})
+              <span className="bg-[#e6f4ea] text-[#137333] border border-[#137333] px-2.5 py-0.5 rounded font-pixel text-[11px] font-bold flex items-center gap-1">
+                <Check className="w-3 h-3" /> Verified Admin: @{session?.user?.name || "Organizer"} ({userSlackId})
               </span>
             </div>
             <p className="font-doodle text-sm text-[#4a4e66] mt-1">
@@ -459,21 +530,24 @@ export default function AdminDashboardPage() {
           <div className="flex items-center gap-3 font-pixel text-xs">
             <button
               onClick={loadSubmissions}
-              className="bg-[#ffe066] border border-[#181926] px-3 py-1.5 rounded hover:bg-[#ffd633]"
+              className="bg-[#ffe066] border border-[#181926] px-3 py-1.5 rounded hover:bg-[#ffd633] inline-flex items-center gap-1.5 font-bold"
             >
-              🔄 Refresh
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>Refresh</span>
             </button>
             <Link
               href="/dashboard"
-              className="bg-[#faf9f5] border border-[#181926] px-3 py-1.5 rounded hover:bg-white"
+              className="bg-[#faf9f5] border border-[#181926] px-3 py-1.5 rounded hover:bg-white inline-flex items-center gap-1.5 font-bold"
             >
-              📦 Founder Form
+              <Package className="w-3.5 h-3.5" />
+              <span>Founder Form</span>
             </Link>
             <Link
               href="/"
-              className="bg-[#faf9f5] border border-[#181926] px-3 py-1.5 rounded hover:bg-white"
+              className="bg-[#faf9f5] border border-[#181926] px-3 py-1.5 rounded hover:bg-white inline-flex items-center gap-1.5 font-bold"
             >
-              🏠 Home
+              <Home className="w-3.5 h-3.5" />
+              <span>Home</span>
             </Link>
           </div>
         </div>
@@ -534,15 +608,18 @@ export default function AdminDashboardPage() {
 
         {/* Loading Spinner */}
         {loading && (
-          <div className="text-center py-12 font-pixel text-base text-gray-600">
-            Loading shipped projects from Supabase... ⏳
+          <div className="text-center py-12 font-pixel text-base text-gray-600 flex items-center justify-center gap-2">
+            <Clock className="w-4 h-4 animate-spin text-[#ec3750]" />
+            <span>Loading shipped projects from Supabase...</span>
           </div>
         )}
 
         {/* Empty State */}
         {!loading && filteredSubmissions.length === 0 && (
           <div className="bg-white p-12 text-center border-2 border-[#181926] rounded-md shadow-[4px_4px_0px_#181926] space-y-3">
-            <span className="text-5xl">📭</span>
+            <div className="w-16 h-16 mx-auto bg-[#faf9f5] border-2 border-[#181926] rounded-2xl flex items-center justify-center">
+              <Inbox className="w-8 h-8 text-gray-500" />
+            </div>
             <h3 className="text-xl font-bold font-sans">No Shipped Projects Found</h3>
             <p className="font-doodle text-sm text-gray-500">
               {searchQuery || filterStatus !== "all"
@@ -567,7 +644,7 @@ export default function AdminDashboardPage() {
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-2 border-dashed border-[#181926]/15 pb-4">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-2xl">📦</span>
+                      <Package className="w-6 h-6 text-[#181926]" />
                       <h2 className="text-2xl font-black text-[#181926]">{sub.title}</h2>
                     </div>
                     <div className="font-pixel text-[11px] text-gray-500 mt-1">
@@ -620,8 +697,8 @@ export default function AdminDashboardPage() {
                         {sub.verified_hours} hrs
                       </span>
                       {hasMilestone && (
-                        <span className="text-[#10b981] font-bold font-pixel text-[10px]">
-                          ⭐ $100 Seed Eligible
+                        <span className="text-[#10b981] font-bold font-pixel text-[10px] flex items-center gap-1">
+                          <Check className="w-3 h-3" /> $100 Seed Eligible
                         </span>
                       )}
                     </div>
@@ -649,7 +726,7 @@ export default function AdminDashboardPage() {
                     rel="noreferrer"
                     className="bg-[#181926] text-white px-3 py-2 rounded flex items-center gap-1.5 hover:bg-[#333] transition"
                   >
-                    <span>🐙</span> GitHub Repository ↗
+                    <GitBranch className="w-3.5 h-3.5" /> GitHub Repository ↗
                   </a>
                   <a
                     href={sub.demo_url}
@@ -657,7 +734,7 @@ export default function AdminDashboardPage() {
                     rel="noreferrer"
                     className="bg-[#ec3750] text-white px-3 py-2 rounded flex items-center gap-1.5 hover:bg-[#d62839] transition"
                   >
-                    <span>🌐</span> Live Startup Demo ↗
+                    <Globe className="w-3.5 h-3.5" /> Live Startup Demo ↗
                   </a>
                 </div>
 
@@ -692,34 +769,35 @@ export default function AdminDashboardPage() {
                 {/* Admin Actions & Collaborative Notes */}
                 <div className="bg-[#fffdf5] border-2 border-[#181926] rounded-md p-4 space-y-4">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#181926]/15 pb-3">
-                    <div className="font-pixel text-xs font-bold text-[#181926]">
-                      ⚖️ Organizer Actions:
+                    <div className="font-pixel text-xs font-bold text-[#181926] flex items-center gap-1.5">
+                      <Shield className="w-4 h-4 text-[#181926]" />
+                      <span>Organizer Actions:</span>
                     </div>
 
                     <div className="flex flex-wrap gap-2 font-pixel text-xs">
                       <button
                         onClick={() => handleUpdateStatus(sub.id, "approved")}
-                        className="bg-[#e6f4ea] text-[#137333] border border-[#137333] px-3 py-1.5 rounded hover:bg-[#cbf0d3] font-bold"
+                        className="bg-[#e6f4ea] text-[#137333] border border-[#137333] px-3 py-1.5 rounded hover:bg-[#cbf0d3] font-bold inline-flex items-center gap-1"
                       >
-                        ✓ Approve ($100 Seed)
+                        <Check className="w-3.5 h-3.5" /> Approve ($100 Seed)
                       </button>
                       <button
                         onClick={() => openReasonModal(sub, "changes_requested")}
-                        className="bg-[#fff7ed] text-[#c2410c] border border-[#c2410c] px-3 py-1.5 rounded hover:bg-[#ffedd5] font-bold"
+                        className="bg-[#fff7ed] text-[#c2410c] border border-[#c2410c] px-3 py-1.5 rounded hover:bg-[#ffedd5] font-bold inline-flex items-center gap-1"
                       >
-                        💬 Request Changes
+                        <MessageSquare className="w-3.5 h-3.5" /> Request Changes
                       </button>
                       <button
                         onClick={() => openReasonModal(sub, "rejected")}
-                        className="bg-[#fee2e2] text-[#ec3750] border border-[#ec3750] px-3 py-1.5 rounded hover:bg-[#fecaca] font-bold"
+                        className="bg-[#fee2e2] text-[#ec3750] border border-[#ec3750] px-3 py-1.5 rounded hover:bg-[#fecaca] font-bold inline-flex items-center gap-1"
                       >
-                        ✕ Reject
+                        <X className="w-3.5 h-3.5" /> Reject
                       </button>
                       <button
                         onClick={() => handleUpdateStatus(sub.id, "pending_review")}
-                        className="bg-white text-gray-600 border border-gray-400 px-2 py-1.5 rounded hover:bg-gray-100"
+                        className="bg-white text-gray-600 border border-gray-400 px-2 py-1.5 rounded hover:bg-gray-100 inline-flex items-center gap-1"
                       >
-                        ⏳ Reset to Pending
+                        <Clock className="w-3.5 h-3.5" /> Reset to Pending
                       </button>
                     </div>
                   </div>
@@ -727,8 +805,9 @@ export default function AdminDashboardPage() {
                   {/* Collaborative Organizer Notes */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <label className="font-pixel text-xs font-bold text-[#181926]">
-                        📝 Organizer Notes (Shared between @Noben_Nobi, @itsnotketan &amp; team):
+                      <label className="font-pixel text-xs font-bold text-[#181926] flex items-center gap-1.5">
+                        <Edit3 className="w-3.5 h-3.5 text-[#181926]" />
+                        <span>Organizer Notes (Shared between @Noben_Nobi, @itsnotketan &amp; team):</span>
                       </label>
                       {sub.reviewed_by && (
                         <span className="font-pixel text-[10px] text-gray-500">
@@ -755,9 +834,10 @@ export default function AdminDashboardPage() {
                         type="button"
                         onClick={() => handleSaveAdminNote(sub.id)}
                         disabled={savingNoteId === sub.id}
-                        className="bg-[#181926] text-white px-3 py-1 rounded font-pixel text-xs hover:bg-[#333] transition disabled:opacity-50"
+                        className="bg-[#181926] text-white px-3 py-1 rounded font-pixel text-xs hover:bg-[#333] transition disabled:opacity-50 inline-flex items-center gap-1.5"
                       >
-                        {savingNoteId === sub.id ? "Saving Note... ⏳" : "💾 Save Organizer Note"}
+                        <Save className="w-3.5 h-3.5" />
+                        <span>{savingNoteId === sub.id ? "Saving Note..." : "Save Organizer Note"}</span>
                       </button>
                     </div>
                   </div>
@@ -793,9 +873,11 @@ export default function AdminDashboardPage() {
             {/* Header */}
             <div className="border-b-2 border-dashed border-[#181926]/20 pb-3">
               <div className="flex items-center gap-2">
-                <span className="text-2xl">
-                  {reasonModal.targetStatus === "rejected" ? "🛑" : "💬"}
-                </span>
+                {reasonModal.targetStatus === "rejected" ? (
+                  <AlertTriangle className="w-6 h-6 text-[#ec3750]" />
+                ) : (
+                  <MessageSquare className="w-6 h-6 text-[#f97316]" />
+                )}
                 <div>
                   <h3 className="text-xl font-black font-sans text-[#181926]">
                     {reasonModal.targetStatus === "rejected"
@@ -876,8 +958,9 @@ export default function AdminDashboardPage() {
 
             {/* Error Message */}
             {reasonModal.error && (
-              <div className="bg-[#fee2e2] text-[#ec3750] border-2 border-[#ec3750] p-2.5 rounded font-pixel text-xs">
-                ⚠️ {reasonModal.error}
+              <div className="bg-[#fee2e2] text-[#ec3750] border-2 border-[#ec3750] p-2.5 rounded font-pixel text-xs flex items-center gap-1.5">
+                <AlertTriangle className="w-4 h-4 shrink-0" />
+                <span>{reasonModal.error}</span>
               </div>
             )}
 
@@ -902,10 +985,10 @@ export default function AdminDashboardPage() {
                 }`}
               >
                 {reasonModal.isSubmitting
-                  ? "Saving Decision... ⏳"
+                  ? "Saving Decision..."
                   : reasonModal.targetStatus === "rejected"
-                  ? "Confirm Rejection ✕"
-                  : "Send Change Request 💬"}
+                  ? "Confirm Rejection"
+                  : "Send Change Request"}
               </button>
             </div>
           </div>
@@ -934,7 +1017,9 @@ export default function AdminDashboardPage() {
               >
                 Open Original Image ↗
               </a>
-              <span>Click outside to close ✕</span>
+              <span className="flex items-center gap-1">
+                <X className="w-3 h-3" /> Click outside to close
+              </span>
             </div>
           </div>
         </div>

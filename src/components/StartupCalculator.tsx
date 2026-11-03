@@ -2,12 +2,12 @@
 
 import React, { useState } from "react";
 import confetti from "canvas-confetti";
+import { Calculator, Sparkles, Check, Lock } from "lucide-react";
 
 export interface LootItem {
   name: string;
   fullName: string;
   pts: number;
-  emoji: string;
   image: string | null;
   tag: string;
   badge?: string;
@@ -18,7 +18,6 @@ export const LOOT_ITEMS: LootItem[] = [
     name: "Stickers & Pass",
     fullName: "Holographic Sticker Pack & Verification Pass",
     pts: 500,
-    emoji: "✨",
     image: null,
     tag: "Free Ship",
     badge: "Base Loot",
@@ -27,7 +26,6 @@ export const LOOT_ITEMS: LootItem[] = [
     name: "Founder Tee",
     fullName: "Fortune Founder Embroidered Heavyweight Tee",
     pts: 1500,
-    emoji: "👕",
     image: "/rewards/founder-tee.webp",
     tag: "$100 Rev",
     badge: "Custom Swag",
@@ -36,7 +34,6 @@ export const LOOT_ITEMS: LootItem[] = [
     name: "Mech Keyboard",
     fullName: "Custom 75% Mechanical Keyboard w/ Rotary Knob",
     pts: 4500,
-    emoji: "⌨️",
     image: "/rewards/custom-mech-keyboard.png",
     tag: "$400 Rev",
     badge: "Hardware",
@@ -45,7 +42,6 @@ export const LOOT_ITEMS: LootItem[] = [
     name: "AirPods Max",
     fullName: "Apple AirPods Max (High-Fidelity Audio)",
     pts: 8000,
-    emoji: "🎧",
     image: "/rewards/airpods-max.jpg",
     tag: "$750 Rev",
     badge: "Pro Audio",
@@ -54,7 +50,6 @@ export const LOOT_ITEMS: LootItem[] = [
     name: "Bambu A1 3D",
     fullName: "Bambu Lab A1 3D Printer (Precision CoreXY)",
     pts: 10000,
-    emoji: "🖨️",
     image: "/rewards/bambu-a1-printer.png",
     tag: "$950+ Rev",
     badge: "Grand Prize",
@@ -85,8 +80,9 @@ export default function StartupCalculator({ compact = false }: StartupCalculator
       
       {/* Title & Tag */}
       <div className="mb-4">
-        <span className="font-pixel text-xs bg-[#ffe066] px-2.5 py-1 rounded border-2 border-[#181926] shadow-[2px_2px_0px_#181926] inline-block mb-1">
-          calculator thingy 🧮
+        <span className="font-pixel text-xs bg-[#ffe066] px-2.5 py-1 rounded border-2 border-[#181926] shadow-[2px_2px_0px_#181926] inline-flex items-center gap-1.5 mb-1 font-bold">
+          <Calculator className="w-3.5 h-3.5" />
+          <span>calculator thingy</span>
         </span>
         <h3 className="font-sans font-black text-2xl sm:text-3xl text-[#181926]">
           Test Your Startup Earnings
@@ -158,8 +154,8 @@ export default function StartupCalculator({ compact = false }: StartupCalculator
                       className="max-h-full max-w-full object-contain hover:scale-105 transition-transform"
                     />
                   ) : (
-                    <div className="text-3xl animate-pulse">
-                      {item.emoji}
+                    <div className="flex flex-col items-center justify-center text-[#ec3750]">
+                      <Sparkles className="w-8 h-8" />
                     </div>
                   )}
                 </div>
@@ -168,19 +164,21 @@ export default function StartupCalculator({ compact = false }: StartupCalculator
                   {item.name}
                 </div>
                 <div className="font-mono text-[10px] text-[#4a4e66] mt-0.5">
-                  {item.pts.toLocaleString()} pts {isUnlocked ? "✓" : ""}
+                  {item.pts.toLocaleString()} pts
                 </div>
               </div>
 
               {/* Status Badge */}
               <div className="mt-1.5 pt-1 border-t border-[#181926]/10">
                 {isUnlocked ? (
-                  <span className="text-[9px] font-pixel text-[#15803d] font-bold bg-white/90 px-1.5 py-0.5 rounded border border-[#10b981]/50 block">
-                    ✓ UNLOCKED
+                  <span className="text-[9px] font-pixel text-[#15803d] font-bold bg-white/90 px-1.5 py-0.5 rounded border border-[#10b981]/50 flex items-center justify-center gap-1">
+                    <Check className="w-2.5 h-2.5" />
+                    <span>UNLOCKED</span>
                   </span>
                 ) : (
-                  <span className="text-[9px] font-pixel text-gray-600 bg-white/70 px-1 py-0.5 rounded block" title={`Need $${Math.ceil(ptsNeeded / 10)} more rev`}>
-                    {item.tag}
+                  <span className="text-[9px] font-pixel text-gray-600 bg-white/70 px-1 py-0.5 rounded flex items-center justify-center gap-1" title={`Need $${Math.ceil(ptsNeeded / 10)} more rev`}>
+                    <Lock className="w-2.5 h-2.5 text-gray-400" />
+                    <span>{item.tag}</span>
                   </span>
                 )}
               </div>
@@ -192,4 +190,3 @@ export default function StartupCalculator({ compact = false }: StartupCalculator
     </div>
   );
 }
-

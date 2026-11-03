@@ -1,5 +1,12 @@
 import type { NextAuthOptions } from "next-auth";
 
+// Automatically sanitize NEXTAUTH_URL to remove any accidental trailing slashes entered in Vercel
+if (process.env.NEXTAUTH_URL) {
+  process.env.NEXTAUTH_URL = process.env.NEXTAUTH_URL.trim().replace(/\/+$/, "");
+} else if (process.env.VERCEL_URL) {
+  process.env.NEXTAUTH_URL = `https://${process.env.VERCEL_URL}`.replace(/\/+$/, "");
+}
+
 export const authOptions: NextAuthOptions = {
   providers: [
     {
@@ -31,6 +38,20 @@ export const authOptions: NextAuthOptions = {
     },
   ],
   callbacks: {
+    async redirect({ url, baseUrl }) {
+      const targetBase = (process.env.NEXTAUTH_URL || baseUrl || "").replace(/\/+$/, "");
+      if (url.startsWith("/")) {
+        return `${targetBase}${url}`;
+      }
+      try {
+        const parsedUrl = new URL(url);
+        const parsedBase = new URL(targetBase);
+        if (parsedUrl.origin === parsedBase.origin) {
+          return url;
+        }
+      } catch {}
+      return targetBase;
+    },
     async jwt({ token, user, profile }) {
       if (user) {
         token.id = user.id;
@@ -52,7 +73,5 @@ export const authOptions: NextAuthOptions = {
     },
   },
   secret: process.env.NEXTAUTH_SECRET || "fortune_ysws_super_secret_hackclub_key_2026_priyanshu",
-  // Tells NextAuth to use the Vercel URL instead of localhost in production
   useSecureCookies: process.env.NODE_ENV === "production",
 };
-

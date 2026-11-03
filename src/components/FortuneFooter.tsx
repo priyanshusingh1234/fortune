@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { Coins } from "lucide-react";
 
 // the footer where we link all the hack club stuff so lawyers are happy
 export default function FortuneFooter() {
@@ -13,7 +14,7 @@ export default function FortuneFooter() {
         {/* col 1: brand */}
         <div>
           <div className="flex items-center gap-2 font-pixel text-base text-[#181926] font-bold">
-            <span>🥠</span>
+            <Coins className="w-5 h-5 text-[#b45309]" />
             <span>Fortune YSWS</span>
           </div>
           <p className="font-doodle text-base font-semibold text-[#4a4e66] leading-relaxed mt-1">
@@ -86,8 +87,8 @@ export default function FortuneFooter() {
               </a>
             </li>
             <li>
-              <a href="https://rsvp.hackclub.community/fortune-ysws" target="_blank" rel="noopener noreferrer" className="hover:text-[#ec3750] hover:underline text-[#ec3750]">
-                RSVP Registration
+              <a href="https://github.com/priyanshusingh1234/fortune" target="_blank" rel="noopener noreferrer" className="hover:text-[#ec3750] hover:underline text-[#ec3750]">
+                GitHub Repository
               </a>
             </li>
             <li>

@@ -142,12 +142,12 @@ export default function FortuneFaq() {
             Ask in #fortune-help
           </a>
           <a
-            href="https://rsvp.hackclub.community/fortune-ysws"
+            href="https://hackclub.slack.com/messages/fortune"
             target="_blank"
             rel="noopener noreferrer"
             className="fortune-btn text-xs"
           >
-            RSVP for Fortune
+            Join #fortune
           </a>
         </div>
       </div>

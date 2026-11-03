@@ -4,6 +4,29 @@ import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { signIn, signOut, useSession } from "next-auth/react";
 import confetti from "canvas-confetti";
+import {
+  Coins,
+  Home,
+  Package,
+  Plus,
+  Clock,
+  MessageSquare,
+  X,
+  Trophy,
+  Check,
+  GitBranch,
+  Globe,
+  Lock,
+  Trash2,
+  Camera,
+  Image as ImageIcon,
+  AlertTriangle,
+  LogIn,
+  ExternalLink,
+  RefreshCw,
+  Upload,
+  Link as LinkIcon,
+} from "lucide-react";
 
 interface HackatimeProject {
   name: string;
@@ -352,8 +375,9 @@ export default function DashboardPage() {
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen bg-[#f7f1e1] flex items-center justify-center font-pixel text-lg text-[#181926]">
-        Loading dashboard... ⏳
+      <div className="min-h-screen bg-[#f7f1e1] flex items-center justify-center font-pixel text-lg text-[#181926] gap-2">
+        <Clock className="w-5 h-5 animate-spin text-[#ec3750]" />
+        <span>Loading dashboard...</span>
       </div>
     );
   }
@@ -363,7 +387,9 @@ export default function DashboardPage() {
     return (
       <div className="min-h-screen bg-[#f7f1e1] flex flex-col items-center justify-center p-6 text-center">
         <div className="wobbly-card bg-white p-8 max-w-md space-y-4 border-2 border-[#181926] shadow-[4px_4px_0px_#181926]">
-          <span className="text-5xl inline-block">🥠</span>
+          <div className="w-16 h-16 mx-auto bg-[#ffe066] border-2 border-[#181926] rounded-2xl flex items-center justify-center shadow-[3px_3px_0px_#181926]">
+            <Coins className="w-8 h-8 text-[#181926]" />
+          </div>
           <h1 className="text-3xl font-black font-sans text-[#181926]">
             Sign in to Ship Your Project
           </h1>
@@ -373,9 +399,10 @@ export default function DashboardPage() {
           <div className="pt-2">
             <button
               onClick={() => signIn("hackclub")}
-              className="fortune-btn fortune-btn-gold w-full text-base"
+              className="fortune-btn fortune-btn-gold w-full text-base inline-flex items-center justify-center gap-2"
             >
-              🚀 Sign in with Hack Club
+              <LogIn className="w-4 h-4" />
+              <span>Sign in with Hack Club</span>
             </button>
           </div>
           <div>
@@ -419,9 +446,10 @@ export default function DashboardPage() {
           <div className="flex items-center gap-3 font-pixel text-xs">
             <Link
               href="/"
-              className="bg-[#f7f1e1] px-3 py-1.5 rounded border border-[#181926] hover:bg-white"
+              className="bg-[#f7f1e1] px-3 py-1.5 rounded border border-[#181926] hover:bg-white inline-flex items-center gap-1.5"
             >
-              🏠 Home
+              <Home className="w-3.5 h-3.5" />
+              <span>Home</span>
             </Link>
             <button
               onClick={() => signOut()}
@@ -438,7 +466,8 @@ export default function DashboardPage() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-2 border-dashed border-[#181926]/15 pb-4">
               <div>
                 <h2 className="text-2xl font-black font-sans text-[#181926] flex items-center gap-2">
-                  <span>🚢</span> Your Shipped Fortune Projects ({userSubmissions.length})
+                  <Package className="w-6 h-6 text-[#181926]" />
+                  <span>Your Shipped Fortune Projects ({userSubmissions.length})</span>
                 </h2>
                 <p className="font-doodle text-sm text-[#4a4e66]">
                   Real-time review status and notes from @Noben_Nobi &amp; the organizers.
@@ -449,7 +478,7 @@ export default function DashboardPage() {
                 onClick={() => setShowNewShipForm(!showNewShipForm)}
                 className="bg-[#ffe066] border-2 border-[#181926] px-3.5 py-1.5 rounded font-pixel text-xs font-bold hover:bg-[#ffd633] transition shadow-[2px_2px_0px_#181926]"
               >
-                {showNewShipForm ? "▲ Hide Form" : "➕ Ship Another Project"}
+                {showNewShipForm ? "Hide Form" : "+ Ship Another Project"}
               </button>
             </div>
 
@@ -486,22 +515,22 @@ export default function DashboardPage() {
                       <div>
                         {isApproved && (
                           <span className="bg-[#10b981] text-white px-3 py-1 rounded-full font-pixel text-xs font-bold inline-flex items-center gap-1 shadow">
-                            ✓ APPROVED ($100 SEED)
+                            <Check className="w-3.5 h-3.5" /> APPROVED ($100 SEED)
                           </span>
                         )}
                         {isPending && (
                           <span className="bg-[#ffe066] text-[#181926] border border-[#181926] px-3 py-1 rounded-full font-pixel text-xs font-bold inline-flex items-center gap-1 shadow animate-pulse">
-                            ⏳ UNDER REVIEW
+                            <Clock className="w-3.5 h-3.5" /> UNDER REVIEW
                           </span>
                         )}
                         {isChanges && (
                           <span className="bg-[#f97316] text-white px-3 py-1 rounded-full font-pixel text-xs font-bold inline-flex items-center gap-1 shadow">
-                            💬 CHANGES REQUESTED
+                            <MessageSquare className="w-3.5 h-3.5" /> CHANGES REQUESTED
                           </span>
                         )}
                         {isRejected && (
                           <span className="bg-[#ec3750] text-white px-3 py-1 rounded-full font-pixel text-xs font-bold inline-flex items-center gap-1 shadow">
-                            ✕ NOT APPROVED
+                            <X className="w-3.5 h-3.5" /> NOT APPROVED
                           </span>
                         )}
                       </div>
@@ -510,7 +539,7 @@ export default function DashboardPage() {
                     {/* Pending State Banner */}
                     {isPending && (
                       <div className="bg-white/80 p-3.5 rounded border border-[#181926]/20 font-sans text-xs text-[#854d0e] flex items-start gap-2.5">
-                        <span className="text-xl">⏳</span>
+                        <Clock className="w-5 h-5 text-[#854d0e] shrink-0 mt-0.5" />
                         <div>
                           <strong className="block font-bold text-sm">Your submission is under active review!</strong>
                           Our team (@Noben_Nobi &amp; organizers) is verifying your Hackatime hours and testing your demo. Keep an eye on <code>#fortune</code> on Slack!
@@ -522,7 +551,7 @@ export default function DashboardPage() {
                     {isApproved && (
                       <div className="bg-white/90 p-4 rounded border-2 border-[#10b981] font-sans text-xs text-[#137333] space-y-2">
                         <div className="flex items-center gap-2 font-bold text-base text-[#10b981]">
-                          <span>🎉</span> Congratulations! Your Startup is Approved!
+                          <Trophy className="w-5 h-5 text-[#10b981]" /> Congratulations! Your Startup is Approved!
                         </div>
                         <p className="text-xs text-[#137333]">
                           Your $100 seed grant has been authorized. Check your Hack Club Bank account or your Slack DMs!
@@ -539,7 +568,7 @@ export default function DashboardPage() {
                     {isChanges && (
                       <div className="bg-white p-4 rounded border-2 border-[#f97316] font-sans text-xs text-[#c2410c] space-y-2">
                         <div className="flex items-center gap-2 font-bold text-sm text-[#f97316]">
-                          <span>💬</span> Organizers Requested Changes:
+                          <MessageSquare className="w-4 h-4 text-[#f97316]" /> Organizers Requested Changes:
                         </div>
                         <div className="bg-[#fff7ed] p-3 rounded border border-[#f97316]/30 font-mono text-xs text-[#9a3412]">
                           <strong>Feedback from {sub.reviewed_by ? `@${sub.reviewed_by}` : "Organizers"}:</strong>
@@ -557,7 +586,7 @@ export default function DashboardPage() {
                     {isRejected && (
                       <div className="bg-white p-4 rounded border-2 border-[#ec3750] font-sans text-xs text-[#991b1b] space-y-2">
                         <div className="flex items-center gap-2 font-bold text-sm text-[#ec3750]">
-                          <span>❌</span> Submission Decision
+                          <AlertTriangle className="w-4 h-4 text-[#ec3750]" /> Submission Decision
                         </div>
                         <div className="bg-[#fee2e2] p-3 rounded border border-[#ec3750]/30 font-mono text-xs text-[#7f1d1d]">
                           <strong>Rejection Reason from {sub.reviewed_by ? `@${sub.reviewed_by}` : "Reviewers"}:</strong>
@@ -580,7 +609,7 @@ export default function DashboardPage() {
                           rel="noreferrer"
                           className="bg-white border border-[#181926] px-2.5 py-1 rounded hover:bg-gray-50 flex items-center gap-1 font-bold"
                         >
-                          🐙 Repo ↗
+                          <GitBranch className="w-3.5 h-3.5" /> Repo ↗
                         </a>
                         <a
                           href={sub.demo_url}
@@ -588,14 +617,14 @@ export default function DashboardPage() {
                           rel="noreferrer"
                           className="bg-white border border-[#181926] px-2.5 py-1 rounded hover:bg-gray-50 flex items-center gap-1 font-bold"
                         >
-                          🌐 Demo ↗
+                          <Globe className="w-3.5 h-3.5" /> Demo ↗
                         </a>
                         {isApproved ? (
                           <span
                             className="bg-gray-100 text-gray-500 border border-gray-300 px-2.5 py-1 rounded font-pixel text-[11px] flex items-center gap-1 cursor-not-allowed select-none"
                             title="Approved submissions cannot be deleted as their $100 seed grant has already been disbursed/authorized."
                           >
-                            🔒 Approved &amp; Locked
+                            <Lock className="w-3 h-3 inline mr-1" /> Approved &amp; Locked
                           </span>
                         ) : (
                           <button
@@ -604,7 +633,7 @@ export default function DashboardPage() {
                             className="bg-[#fee2e2] text-[#ec3750] border border-[#ec3750] hover:bg-[#fecaca] px-2.5 py-1 rounded font-pixel text-[11px] flex items-center gap-1 transition cursor-pointer"
                             title="Delete this submission and permanently erase all attached images"
                           >
-                            🗑️ Delete
+                            <Trash2 className="w-3 h-3 inline mr-1" /> Delete
                           </button>
                         )}
                       </div>
@@ -639,7 +668,8 @@ export default function DashboardPage() {
           <div className="wobbly-card bg-white p-6 sm:p-8 space-y-6">
             <div className="border-b-2 border-dashed border-[#181926]/15 pb-4">
               <h2 className="text-2xl font-black font-sans text-[#181926] flex items-center gap-2">
-                <span>📦</span> Ship Your Fortune Project
+                <Package className="w-6 h-6 text-[#181926]" />
+                <span>Ship Your Fortune Project</span>
               </h2>
               <p className="font-doodle text-base text-[#4a4e66] mt-1">
                 Fill out the details below. Our team (@Noben_Nobi &amp; organizers) will review your submission!
@@ -647,14 +677,17 @@ export default function DashboardPage() {
             </div>
 
             {errorMessage && (
-              <div className="bg-[#fde8e8] border-2 border-[#ec3750] p-4 rounded-md font-pixel text-xs text-[#ec3750]">
-                ⚠️ {errorMessage}
+              <div className="bg-[#fde8e8] border-2 border-[#ec3750] p-4 rounded-md font-pixel text-xs text-[#ec3750] flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 shrink-0" />
+                <span>{errorMessage}</span>
               </div>
             )}
 
             {submitted ? (
               <div className="bg-[#e6f4ea] border-2 border-[#137333] p-6 rounded-lg text-center space-y-4">
-                <span className="text-4xl">🎉</span>
+                <div className="w-12 h-12 mx-auto bg-[#137333]/10 rounded-full flex items-center justify-center">
+                  <Trophy className="w-6 h-6 text-[#137333]" />
+                </div>
                 <h3 className="text-2xl font-bold font-sans text-[#137333]">
                   Project Shipped Successfully!
                 </h3>
@@ -694,8 +727,9 @@ export default function DashboardPage() {
                 {/* 2. Hackatime Project Auto-Suggestion */}
                 <div className="bg-[#fffdf5] p-4 rounded-md border-2 border-[#181926] space-y-2">
                   <div className="flex items-center justify-between">
-                    <label className="block font-pixel text-xs font-bold text-[#181926]">
-                      ⏱️ Link Hackatime Project (Coding Hours) *
+                    <label className="font-pixel text-xs font-bold text-[#181926] flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5 text-[#181926]" />
+                      <span>Link Hackatime Project (Coding Hours) *</span>
                     </label>
                     <a
                       href="https://hackatime.hackclub.com"
@@ -708,8 +742,9 @@ export default function DashboardPage() {
                   </div>
 
                   {loadingProjects && projects.length === 0 ? (
-                    <div className="p-3 bg-white border border-[#181926]/20 rounded text-xs font-pixel text-gray-500 animate-pulse">
-                      Scanning your Hackatime projects ({projects.length} loaded)... ⏳
+                    <div className="p-3 bg-white border border-[#181926]/20 rounded text-xs font-pixel text-gray-500 animate-pulse flex items-center gap-2">
+                      <Clock className="w-3.5 h-3.5 animate-spin" />
+                      <span>Scanning your Hackatime projects ({projects.length} loaded)...</span>
                     </div>
                   ) : (
                     <div className="space-y-2">
@@ -723,10 +758,10 @@ export default function DashboardPage() {
                         )}
                         {projects.map((p) => (
                           <option key={p.name} value={p.name}>
-                            📁 {p.name} ({p.hours} hrs tracked) {p.hours >= 10 ? "⭐ Seed Eligible" : ""}
+                            [Folder] {p.name} ({p.hours} hrs tracked) {p.hours >= 10 ? "★ Seed Eligible" : ""}
                           </option>
                         ))}
-                        <option value="__CUSTOM__">➕ Enter custom project folder name...</option>
+                        <option value="__CUSTOM__">+ Enter custom project folder name...</option>
                       </select>
 
                       {selectedCustom && (
@@ -741,11 +776,13 @@ export default function DashboardPage() {
 
                       {formData.verifiedHours > 0 && (
                         <div className="flex items-center gap-2 pt-1 font-pixel text-xs">
-                          <span className="bg-[#e6f4ea] text-[#137333] px-2.5 py-1 rounded-full border border-[#137333]/30 font-bold">
-                            ✓ {formData.verifiedHours} Hours Verified on Hackatime
+                          <span className="bg-[#e6f4ea] text-[#137333] px-2.5 py-1 rounded-full border border-[#137333]/30 font-bold flex items-center gap-1">
+                            <Check className="w-3 h-3" /> {formData.verifiedHours} Hours Verified on Hackatime
                           </span>
                           {formData.verifiedHours >= 10 ? (
-                            <span className="text-[#10b981] font-bold">🎯 Milestone Hit!</span>
+                            <span className="text-[#10b981] font-bold flex items-center gap-1">
+                              <Check className="w-3 h-3" /> 10h Milestone Hit!
+                            </span>
                           ) : (
                             <span className="text-gray-500">(10+ hrs recommended for seed grant)</span>
                           )}
@@ -759,7 +796,7 @@ export default function DashboardPage() {
                           onClick={() => setShowCustomLookup(!showCustomLookup)}
                           className="font-pixel text-[11px] text-gray-500 hover:text-[#ec3750] underline cursor-pointer"
                         >
-                          {showCustomLookup ? "▲ Hide lookup tool" : "🔍 Using a different Hackatime username or ID?"}
+                          {showCustomLookup ? "Hide lookup tool" : "Using a different Hackatime username or ID?"}
                         </button>
 
                         {showCustomLookup && (
@@ -835,8 +872,9 @@ export default function DashboardPage() {
                 <div className="bg-[#faf9f5] p-5 rounded-md border-2 border-[#181926] space-y-4">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-[#181926]/15 pb-2">
                     <div>
-                      <label className="block font-pixel text-xs font-bold text-[#181926]">
-                        📸 Screenshots of Project Working *
+                      <label className="block font-pixel text-xs font-bold text-[#181926] flex items-center gap-1.5">
+                        <Camera className="w-3.5 h-3.5" />
+                        <span>Screenshots of Project Working *</span>
                       </label>
                       <span className="font-doodle text-xs text-gray-500">
                         Upload proof of your working project (Max 5 images). Stored in Supabase.
@@ -856,8 +894,9 @@ export default function DashboardPage() {
                   </div>
 
                   {uploadError && (
-                    <div className="bg-[#fee2e2] border border-[#ec3750] text-[#ec3750] px-3 py-2 rounded font-pixel text-xs">
-                      ⚠️ {uploadError}
+                    <div className="bg-[#fee2e2] border border-[#ec3750] text-[#ec3750] px-3 py-2 rounded font-pixel text-xs flex items-center gap-1.5">
+                      <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                      <span>{uploadError}</span>
                     </div>
                   )}
 
@@ -880,9 +919,9 @@ export default function DashboardPage() {
                           isUploading ? "opacity-60 cursor-not-allowed" : ""
                         }`}
                       >
-                        <span className="text-3xl mb-1">🖼️</span>
+                        <ImageIcon className="w-8 h-8 mb-1 text-gray-500" />
                         <span className="font-pixel text-xs font-bold text-[#181926]">
-                          {isUploading ? "Uploading Image to Storage... ⏳" : "Click to Browse or Drag & Drop Images"}
+                          {isUploading ? "Uploading Image to Storage..." : "Click to Browse or Drag & Drop Images"}
                         </span>
                         <span className="font-doodle text-xs text-gray-500 mt-1">
                           PNG, JPG, WEBP, or GIF up to 5MB (Slot for {5 - screenshots.length} more)
@@ -890,8 +929,9 @@ export default function DashboardPage() {
                       </label>
                     </div>
                   ) : (
-                    <div className="bg-[#e6f4ea] border-2 border-[#137333] text-[#137333] p-3 rounded text-center font-pixel text-xs font-bold">
-                      ✓ Maximum 5 screenshots attached! You can remove any image below to replace it.
+                    <div className="bg-[#e6f4ea] border-2 border-[#137333] text-[#137333] p-3 rounded text-center font-pixel text-xs font-bold flex items-center justify-center gap-1.5">
+                      <Check className="w-4 h-4" />
+                      <span>Maximum 5 screenshots attached! You can remove any image below to replace it.</span>
                     </div>
                   )}
 
@@ -934,9 +974,10 @@ export default function DashboardPage() {
                     <button
                       type="button"
                       onClick={() => setShowUrlInput(!showUrlInput)}
-                      className="font-pixel text-[11px] text-gray-500 hover:text-[#ec3750] underline cursor-pointer"
+                      className="font-pixel text-[11px] text-gray-500 hover:text-[#ec3750] underline cursor-pointer inline-flex items-center gap-1"
                     >
-                      {showUrlInput ? "▲ Hide URL input" : "🔗 Or paste direct image URL (Imgur, Scrapbook, Slack)"}
+                      <LinkIcon className="w-3 h-3" />
+                      <span>{showUrlInput ? "Hide URL input" : "Or paste direct image URL (Imgur, Scrapbook, Slack)"}</span>
                     </button>
 
                     {showUrlInput && (
@@ -1022,7 +1063,7 @@ export default function DashboardPage() {
                     disabled={isSubmitting || isUploading}
                     className="fortune-btn fortune-btn-gold w-full text-base py-3.5 disabled:opacity-50"
                   >
-                    {isSubmitting ? "Shipping Project to Review... ⏳" : "🚀 Ship Project to Review"}
+                    {isSubmitting ? "Shipping Project to Review..." : "Ship Project to Review"}
                   </button>
                 </div>
 
@@ -1054,7 +1095,9 @@ export default function DashboardPage() {
             </button>
 
             <div className="flex items-center gap-3 border-b-2 border-dashed border-[#181926]/20 pb-3">
-              <span className="text-3xl">🗑️</span>
+              <div className="w-10 h-10 bg-[#fee2e2] rounded-lg border border-[#ec3750] flex items-center justify-center shrink-0">
+                <Trash2 className="w-5 h-5 text-[#ec3750]" />
+              </div>
               <div>
                 <h3 className="text-xl font-black font-sans text-[#181926]">
                   Delete Submission?
@@ -1066,8 +1109,9 @@ export default function DashboardPage() {
             </div>
 
             {deleteModal.error ? (
-              <div className="bg-[#fee2e2] text-[#ec3750] border-2 border-[#ec3750] p-3 rounded font-pixel text-xs">
-                ⚠️ {deleteModal.error}
+              <div className="bg-[#fee2e2] text-[#ec3750] border-2 border-[#ec3750] p-3 rounded font-pixel text-xs flex items-center gap-1.5">
+                <AlertTriangle className="w-4 h-4 shrink-0" />
+                <span>{deleteModal.error}</span>
               </div>
             ) : (
               <div className="space-y-2 font-sans text-xs text-[#4a4e66]">
@@ -1075,8 +1119,9 @@ export default function DashboardPage() {
                   Are you sure you want to permanently delete your submission for{" "}
                   <strong className="text-[#181926]">&ldquo;{deleteModal.projectTitle}&rdquo;</strong>?
                 </p>
-                <div className="bg-[#fff1f2] border border-[#ec3750]/30 p-2.5 rounded text-[11px] text-[#991b1b]">
-                  ⚠️ <strong>Action cannot be undone:</strong> This will erase the database record and permanently delete all attached screenshot images from cloud storage.
+                <div className="bg-[#fff1f2] border border-[#ec3750]/30 p-2.5 rounded text-[11px] text-[#991b1b] flex items-start gap-1.5">
+                  <AlertTriangle className="w-4 h-4 shrink-0 text-[#ec3750] mt-0.5" />
+                  <span><strong>Action cannot be undone:</strong> This will erase the database record and permanently delete all attached screenshot images from cloud storage.</span>
                 </div>
               </div>
             )}
@@ -1097,7 +1142,7 @@ export default function DashboardPage() {
                   disabled={deleteModal.isDeleting}
                   className="bg-[#ec3750] text-white hover:bg-[#d62839] border border-[#181926] px-4 py-1.5 rounded font-bold shadow-[2px_2px_0px_#181926] transition disabled:opacity-50"
                 >
-                  {deleteModal.isDeleting ? "Erasing Data... ⏳" : "Yes, Permanently Delete 🗑️"}
+                  {deleteModal.isDeleting ? "Erasing Data..." : "Yes, Permanently Delete"}
                 </button>
               )}
             </div>

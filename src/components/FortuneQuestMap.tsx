@@ -91,7 +91,7 @@ export default function FortuneQuestMap() {
             </p>
 
             <div className="font-doodle text-sm font-bold text-[#ec3750]">
-              👉 {st.funnyNote}
+              * {st.funnyNote}
             </div>
           </div>
         ))}
@@ -106,7 +106,7 @@ export default function FortuneQuestMap() {
       {/* note for sponsors */}
       <div className="wobbly-card p-6 bg-white max-w-2xl mx-auto rotate-[-0.3deg] text-left">
         <div className="font-pixel text-xs text-[#ec3750] font-bold mb-1">
-          🏢 NOTE FOR SPONSORS & DONORS
+          NOTE FOR SPONSORS &amp; DONORS
         </div>
         <h4 className="font-sans font-black text-xl text-[#181926] mb-2">
           Want to back teenage builders?

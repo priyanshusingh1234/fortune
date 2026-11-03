@@ -135,3 +135,48 @@ input[type="checkbox"],
 input[type="radio"] {
   cursor: url('/cursor-hand.svg') 11 2, pointer !important;
 }
+
+/* 3D Retro CRT Monitor Chassis Styles (Noben_Nobi 3D Spec) */
+.crt-3d-perspective {
+  perspective: 1200px;
+  perspective-origin: center center;
+}
+
+.crt-3d-chassis {
+  transform-style: preserve-3d;
+  transform: rotateY(-13deg) rotateX(3.5deg);
+  box-shadow: 18px 22px 0px #181926, 26px 30px 20px rgba(24, 25, 38, 0.18);
+  transition: transform 0.5s cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 0.5s ease;
+}
+
+.crt-3d-chassis:hover {
+  transform: rotateY(-7deg) rotateX(1.8deg) translateY(-6px);
+  box-shadow: 22px 26px 0px #181926, 32px 36px 24px rgba(24, 25, 38, 0.22);
+}
+
+/* CRT Screen Scanlines & Curve */
+.crt-screen-glass {
+  background: radial-gradient(circle at 50% 50%, #171926 0%, #0c0d14 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.crt-screen-glass::before {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+  z-index: 5;
+  background-size: 100% 3px, 4px 100%;
+  pointer-events: none;
+}
+
+@keyframes crt-glow {
+  0%, 100% { opacity: 0.96; }
+  50% { opacity: 1; }
+}
+
+.crt-phosphor-glow {
+  animation: crt-glow 2.5s infinite ease-in-out;
+}

@@ -27,6 +27,11 @@ import {
   X,
   Cpu,
   Sparkles,
+  Wrench,
+  Crown,
+  Users,
+  ArrowRight,
+  Dices,
 } from "lucide-react";
 
 interface RetroComputerHeroProps {
@@ -36,6 +41,20 @@ interface RetroComputerHeroProps {
 export default function RetroComputerHero({ fullscreen = false }: RetroComputerHeroProps) {
   const { data: session } = useSession();
   const isAdmin = isUserAdmin(session?.user);
+
+  // Noben_Nobi 3D Boot & Auth Modal State (When user clicks start on landing page)
+  const [authBooting, setAuthBooting] = useState(false);
+  const [authStep, setAuthStep] = useState<"bios" | "prompt" | "authorizing">("bios");
+
+  const handleTriggerAuthBoot = () => {
+    setAuthBooting(true);
+    setAuthStep("bios");
+
+    // 1.2s authentic BIOS memory check, then transition to Hack Club Auth prompt
+    setTimeout(() => {
+      setAuthStep("prompt");
+    }, 1200);
+  };
 
   // OS State: "off" | "booting" | "desktop"
   const [osState, setOsState] = useState<"off" | "booting" | "desktop">("off");
@@ -168,40 +187,269 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
     return f.q.toLowerCase().includes(query) || f.a.toLowerCase().includes(query);
   });
 
-  return (
-    <section className={
-      fullscreen
-        ? "w-full h-full flex flex-col p-1 sm:p-2 bg-[#1b1c24] overflow-hidden"
-        : "relative pt-24 pb-16 px-4 sm:px-6 max-w-6xl mx-auto"
-    }>
-      
-      {/* Top Credits Ribbon (Only shown on public landing page when NOT in fullscreen PC mode) */}
-      {!fullscreen && (
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-6 font-pixel text-xs">
+  // Noben_Nobi 3D Landing Page Mode (When logged out / public visitor)
+  if (!fullscreen) {
+    return (
+      <section className="relative pt-20 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        {/* Fullscreen Cinematic Boot & Hack Club Auth Overlay (When user clicks Start / Turn On PC) */}
+        {authBooting && (
+          <div className="fixed inset-0 z-[100] bg-[#0c0d14] flex flex-col items-center justify-center p-4 animate-in fade-in duration-200">
+            {/* CRT scanline and curve simulation */}
+            <div className="scanlines pointer-events-none z-10"></div>
+            <div className="crt-flicker pointer-events-none z-10"></div>
+
+            {/* BIOS BOOTING STAGE */}
+            {authStep === "bios" && (
+              <div className="max-w-lg w-full bg-[#0a0a0f] p-8 rounded-2xl border-4 border-[#10b981] shadow-[0_0_30px_rgba(16,185,129,0.3)] font-mono text-xs sm:text-sm text-[#10b981] space-y-3 relative z-20">
+                <div className="flex items-center justify-between border-b border-[#10b981]/40 pb-2 font-pixel text-xs text-[#ffe066]">
+                  <span>FORTUNE 1994 BIOS v4.05</span>
+                  <span>(C) HACK CLUB</span>
+                </div>
+                <div className="space-y-1.5 pt-2">
+                  <p>&gt; CHECKING BASE MEMORY: 640KB OK</p>
+                  <p>&gt; EXTENDED MEMORY: 384KB OK</p>
+                  <p>&gt; MOUNTING FLOPPY DRIVE A:\ [1.44MB]...</p>
+                  <p className="text-[#ffe066] animate-pulse">&gt; INITIALIZING HACK CLUB AUTHENTICATION PROTOCOL...</p>
+                </div>
+              </div>
+            )}
+
+            {/* HACK CLUB AUTH PROMPT STAGE (Matching Pixl Modal from Noben's Screenshot) */}
+            {authStep === "prompt" && (
+              <div className="w-full max-w-md bg-[#161722] text-white p-7 rounded-2xl border-4 border-[#181926] shadow-[8px_8px_0px_#ffe066] space-y-5 animate-in zoom-in-95 duration-200 relative z-20">
+                <div className="flex items-center justify-center gap-2 bg-[#ec3750] text-white px-3 py-1 rounded-full text-xs font-pixel font-bold mx-auto w-fit">
+                  <span className="w-4 h-4 rounded-full bg-white text-[#ec3750] flex items-center justify-center text-[10px] font-bold">h</span>
+                  <span>Hack Club Auth</span>
+                </div>
+
+                <div className="space-y-1 text-center">
+                  <h2 className="text-2xl font-black font-sans text-white">Continue to Fortune?</h2>
+                  <p className="text-xs text-gray-300">Authorize Fortune to use your account?</p>
+                  <p className="text-[11px] text-gray-400 mt-2">This is an official Hack Club program run by Hack Club HQ.</p>
+                </div>
+
+                <div className="p-3 bg-[#202234] rounded-lg border border-gray-700/60 text-[11px] text-gray-300 font-pixel text-center">
+                  What account info will be shared? • Slack ID &amp; Hours
+                </div>
+
+                <div className="flex gap-3 pt-2 font-pixel text-xs">
+                  <button
+                    onClick={() => setAuthBooting(false)}
+                    className="flex-1 bg-[#ec3750] hover:bg-[#d6253e] text-white py-3 rounded-xl font-bold border-2 border-white shadow-[2px_2px_0px_#000] transition active:scale-95"
+                  >
+                    Deny
+                  </button>
+                  <button
+                    onClick={() => {
+                      setAuthStep("authorizing");
+                      signIn("hackclub");
+                    }}
+                    className="flex-1 bg-[#10b981] hover:bg-[#059669] text-white py-3 rounded-xl font-bold border-2 border-white shadow-[2px_2px_0px_#000] flex items-center justify-center gap-1 transition active:scale-95"
+                  >
+                    <span>Okay! →</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* AUTHORIZING REDIRECT STAGE */}
+            {authStep === "authorizing" && (
+              <div className="font-pixel text-base text-[#ffe066] animate-pulse relative z-20 flex items-center gap-2">
+                <Clock className="w-5 h-5 animate-spin text-[#ec3750]" />
+                <span>Redirecting to Hack Club Slack OAuth...</span>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Top Credits Ribbon */}
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-8 font-pixel text-xs">
           <div className="flex items-center gap-2">
             <span className="bg-[#ec3750] text-white px-3 py-1 rounded-full border-2 border-[#181926] shadow-[2px_2px_0px_#181926] font-bold">
-              HACK CLUB YSWS
+              ★ HACK CLUB YSWS
             </span>
-            <span className="bg-white px-3 py-1 rounded-full border-2 border-[#181926] shadow-[2px_2px_0px_#181926] text-[#b45309] font-bold">
-              Org: @Noben_Nobi
+            <span className="bg-[#fffbeb] px-3 py-1 rounded-full border-2 border-[#181926] shadow-[2px_2px_0px_#181926] text-[#b45309] font-bold flex items-center gap-1">
+              <Crown className="w-3.5 h-3.5" /> Org: @Noben_Nobi
             </span>
-            <span className="bg-white px-3 py-1 rounded-full border-2 border-[#181926] shadow-[2px_2px_0px_#181926] text-[#15803d] font-bold">
-              Co-Org: @itsnotketan
+            <span className="bg-[#f0fdf4] px-3 py-1 rounded-full border-2 border-[#181926] shadow-[2px_2px_0px_#181926] text-[#15803d] font-bold flex items-center gap-1">
+              <Users className="w-3.5 h-3.5" /> Co-Org: @itsnotketan
             </span>
           </div>
 
-          <div className="bg-white px-3 py-1 rounded-full border-2 border-[#181926] shadow-[2px_2px_0px_#181926] text-[#ec3750] font-bold">
-            Lead Dev: Priyanshu Singh
+          <div className="bg-[#fef2f2] px-3 py-1 rounded-full border-2 border-[#181926] shadow-[2px_2px_0px_#181926] text-[#ec3750] font-bold flex items-center gap-1">
+            <Wrench className="w-3.5 h-3.5" /> Lead Dev: Priyanshu Singh
           </div>
         </div>
-      )}
 
+        {/* Two-Column Hero Grid: Left Content + Right 3D CRT Monitor (Noben_Nobi Spec) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+          
+          {/* LEFT COLUMN: Headings, Elevator Pitch, CTA Buttons, Badges */}
+          <div className="lg:col-span-7 space-y-4">
+            <div className="font-doodle text-2xl text-[#ec3750] font-bold -rotate-2">
+              ~ a hack club ysws for teen founders ~
+            </div>
+
+            <h1 className="font-sans font-black text-6xl sm:text-7xl text-[#181926] tracking-tight leading-none">
+              Fortune<span className="text-[#f59e0b]">.</span>
+            </h1>
+
+            <p className="font-doodle text-2xl text-[#b82438] font-bold">
+              code whatever you want • get seed funded • make actual cash
+            </p>
+
+            <div className="wobbly-card p-5 max-w-xl bg-white text-base text-[#242636] font-medium leading-relaxed shadow-[5px_5px_0px_#181926]">
+              tired of building stuff that dies in a github graveyard? pick any tech stack, build software people actually want, pitch your idea, and get <strong>$100 seed micro-funding</strong> via Hack Club Bank. then spend 3-4 months growing it into a real business!
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3 pt-2">
+              <button
+                onClick={handleTriggerAuthBoot}
+                className="fortune-btn fortune-btn-gold text-base inline-flex items-center gap-2 group hover:scale-105 transition-all"
+              >
+                <Power className="w-4 h-4 text-[#ec3750] group-hover:scale-110 transition-transform" />
+                <span>Start PC &amp; Ship for $100</span>
+              </button>
+
+              <a
+                href="#quest"
+                className="fortune-btn text-base inline-flex items-center gap-1.5"
+              >
+                <Map className="w-4 h-4" />
+                <span>How It Works</span>
+              </a>
+
+              <a
+                href="#faq"
+                className="fortune-btn text-base inline-flex items-center gap-1.5"
+              >
+                <HelpCircle className="w-4 h-4" />
+                <span>FAQ</span>
+              </a>
+
+              <a
+                href="https://hackclub.slack.com/messages/fortune"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-doodle text-lg font-bold text-[#ec3750] hover:underline rotate-[-1deg] inline-flex items-center gap-1 ml-1"
+              >
+                <span>join #fortune on slack</span>
+                <ArrowRight className="w-4 h-4" />
+              </a>
+            </div>
+
+            {/* Silly Stamps */}
+            <div className="flex flex-wrap gap-2 text-xs font-pixel pt-2">
+              <span className="bg-white px-2.5 py-1 border-2 border-dashed border-[#ec3750] text-[#ec3750] rounded rotate-[-1deg] inline-flex items-center gap-1 shadow-sm">
+                <Check className="w-3 h-3" /> 100% free for teens
+              </span>
+              <span className="bg-white px-2.5 py-1 border-2 border-dashed border-[#10b981] text-[#10b981] rounded rotate-[1deg] inline-flex items-center gap-1 shadow-sm">
+                <Check className="w-3 h-3" /> $100 seed funding
+              </span>
+              <span className="bg-white px-2.5 py-1 border-2 border-dashed border-[#f59e0b] text-[#b37700] rounded rotate-[-0.5deg] inline-flex items-center gap-1 shadow-sm">
+                <Check className="w-3 h-3" /> top 5 win hardware
+              </span>
+            </div>
+          </div>
+
+          {/* RIGHT COLUMN: 3D Angled CRT Monitor (Noben_Nobi 3D Spec) */}
+          <div className="lg:col-span-5 flex justify-center">
+            <div className="crt-3d-perspective w-full max-w-md">
+              <div className="crt-3d-chassis bg-[#e8dec0] p-4 sm:p-5 rounded-[26px] border-4 border-[#181926] relative">
+                
+                {/* Monitor Top Bezel Bar */}
+                <div className="flex items-center justify-between pb-2 px-1 border-b-2 border-[#181926]/15 mb-3 font-pixel text-[10px] text-[#5c503b]">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-[#181926]/40"></span>
+                    <span className="font-bold tracking-widest">FORTUNE 1994 CRT MATRIX</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-[#10b981] shadow-[0_0_6px_#10b981] animate-ping"></span>
+                    <span className="font-bold text-[#10b981]">STANDBY</span>
+                  </div>
+                </div>
+
+                {/* 3D CRT Screen Glass Surface */}
+                <div 
+                  onClick={handleTriggerAuthBoot}
+                  className="crt-screen-glass rounded-xl border-4 border-[#2b2416] p-6 text-center cursor-pointer transition-all hover:border-[#ec3750] group relative"
+                  title="Click to power on workstation"
+                >
+                  <div className="scanlines pointer-events-none z-10"></div>
+                  <div className="crt-flicker pointer-events-none z-10"></div>
+
+                  {/* Phosphor glow contents */}
+                  <div className="crt-phosphor-glow relative z-20 space-y-4">
+                    {/* Fortune Cookie / Terminal Logo */}
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-[#ffe066] border-3 border-white shadow-[4px_4px_0px_#000] flex items-center justify-center text-[#181926] mx-auto group-hover:scale-105 transition-transform">
+                      <Terminal className="w-9 h-9 sm:w-11 sm:h-11 text-[#181926]" />
+                    </div>
+
+                    <div className="space-y-1">
+                      <h3 className="font-pixel text-xl sm:text-2xl text-[#ffe066] drop-shadow-[0_0_10px_rgba(255,224,102,0.5)]">
+                        FORTUNE OS
+                      </h3>
+                      <p className="font-mono text-[11px] text-[#67e8f9] tracking-wider">
+                        1994 WORKSTATION MATRIX
+                      </p>
+                      <span className="inline-block bg-[#10b981]/20 border border-[#10b981] text-[#10b981] px-2 py-0.5 rounded font-pixel text-[10px] mt-1">
+                        READY TO BOOT
+                      </span>
+                    </div>
+
+                    {/* Big Glowing Start Switch */}
+                    <div className="pt-2">
+                      <div className="bg-[#ec3750] group-hover:bg-[#d6253e] text-white font-pixel text-xs sm:text-sm font-bold py-3 px-4 rounded-xl border-2 border-white shadow-[3px_3px_0px_#000] inline-flex items-center gap-2 group-hover:scale-105 transition-all">
+                        <Power className="w-4 h-4 animate-pulse" />
+                        <span>[ CLICK TO START PC ]</span>
+                      </div>
+                    </div>
+
+                    <p className="font-pixel text-[9px] text-gray-400">
+                      Click to boot workstation &amp; connect Slack
+                    </p>
+                  </div>
+                </div>
+
+                {/* Monitor Lower Chassis: Floppy drive, Vents, Controls */}
+                <div className="flex items-center justify-between pt-3 mt-1 px-1 font-pixel text-[10px] text-[#786b51]">
+                  <div className="flex items-center gap-2">
+                    {/* 3.5" Floppy Slot */}
+                    <div className="bg-[#181926] w-24 sm:w-28 h-3 rounded-sm border border-black/40 flex items-center px-1">
+                      <span className="text-[7px] text-gray-400 font-mono">A:\ 1.44MB</span>
+                    </div>
+                    <span className="text-[9px]">[EJECT]</span>
+                  </div>
+
+                  {/* Rotary Controls & Power Switch */}
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-3.5 h-3.5 rounded-full bg-[#181926]/30 border border-[#181926]" title="Brightness"></div>
+                    <div className="w-3.5 h-3.5 rounded-full bg-[#181926]/30 border border-[#181926]" title="Contrast"></div>
+                    <div 
+                      onClick={handleTriggerAuthBoot}
+                      className="w-5 h-5 rounded-md bg-[#ec3750] border-2 border-[#181926] flex items-center justify-center text-white text-[8px] font-bold cursor-pointer hover:bg-[#d6253e]"
+                      title="Power switch"
+                    >
+                      PWR
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+    );
+  }
+
+  // Fullscreen Workstation Mode (For Logged-In Authenticated Founders)
+  return (
+    <section className="w-full h-full flex flex-col p-1 sm:p-2 bg-[#1b1c24] overflow-hidden">
+      
       {/* Main Retro Monitor Chassis Container */}
-      <div className={
-        fullscreen
-          ? "flex-1 min-h-0 flex flex-col w-full"
-          : `transition-all duration-700 mx-auto ${osState === "desktop" ? "scale-[1.02] max-w-5xl" : "max-w-4xl"}`
-      }>
+      <div className="flex-1 min-h-0 flex flex-col w-full">
         
         {/* Retro Macintosh / CRT Bezel (Warm Beige #e8dec0) */}
         <div className={

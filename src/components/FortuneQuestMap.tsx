@@ -50,7 +50,7 @@ export default function FortuneQuestMap() {
 
   return (
     <section className="py-16 px-6 max-w-5xl mx-auto" id="quest">
-      
+
       {/* section header */}
       <div className="text-center mb-12">
         <span className="font-doodle text-2xl text-[#ec3750] font-bold block rotate-[-1deg]">
@@ -112,7 +112,7 @@ export default function FortuneQuestMap() {
           Want to back teenage builders?
         </h4>
         <p className="text-xs sm:text-sm text-[#3a3d52] font-medium leading-relaxed mb-3">
-          Fortune is run under <strong>Hack Club</strong>, a 501(c)(3) non-profit organization. Every dollar sponsored goes directly to teen builders via <strong>Hack Club Bank (HCB)</strong> with 100% public financial records. If you represent an organization or company and want to sponsor seed micro-grants or hardware prizes, message us in <strong>#fortune</strong> on Slack or email <strong>team@hackclub.com</strong>!
+          Fortune is run under <strong>Hack Club</strong>, a 501(c)(3) non-profit organization. Every dollar sponsored goes directly to teen builders via <strong>Hack Club Bank (HCB)</strong> with 100% public financial records. If you represent an organization or company and want to sponsor seed micro-grants or hardware prizes, message us in <strong>#fortune</strong> on Slack or email <strong>kpk22128@gmail.com</strong>!
         </p>
         <div className="font-doodle text-sm font-bold text-[#ec3750]">
           ★ 100% tax-deductible • 100% goes directly to teen founders.

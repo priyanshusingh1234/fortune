@@ -207,10 +207,14 @@ export default function DashboardPage() {
   };
 
   const fetchHackatimeProjects = (targetId?: string) => {
-    const identifier = targetId || (session?.user as any)?.slack_id || session?.user?.name || "default";
+    const slackId = (session?.user as any)?.slack_id || (session?.user as any)?.id || "";
+    const username = session?.user?.name || "";
+    const queryParam = targetId
+      ? `userId=${encodeURIComponent(targetId)}`
+      : `slackId=${encodeURIComponent(slackId)}&username=${encodeURIComponent(username)}`;
 
     setLoadingProjects(true);
-    fetch(`/api/hackatime/projects?slackId=${encodeURIComponent(identifier)}`)
+    fetch(`/api/hackatime/projects?${queryParam}`)
       .then((res) => res.json())
       .then((data) => {
         if (data?.projects && Array.isArray(data.projects)) {
@@ -222,6 +226,14 @@ export default function DashboardPage() {
               ...prev,
               hackatimeProject: first.name,
               verifiedHours: first.hours,
+            }));
+          } else {
+            // When friend has no automated projects detected, clear and select custom
+            setSelectedCustom(true);
+            setFormData((prev) => ({
+              ...prev,
+              hackatimeProject: "",
+              verifiedHours: 0,
             }));
           }
         }

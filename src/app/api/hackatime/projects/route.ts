@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
-// Common non-project folder names logged by editor plugins to exclude (similar to Stardance's EXCLUDED_NAMES)
+// Common non-project folder names logged by editor plugins to exclude
 const EXCLUDED_FOLDERS = new Set([
   ".history",
   "Other",
@@ -62,40 +64,48 @@ const EXCLUDED_FOLDERS = new Set([
   "Ps keyboard",
 ]);
 
-// Known Hackatime user IDs for instant resolution
-const KNOWN_HACKATIME_IDS: Record<string, number> = {
-  kpk22128: 67074,
-  priyanshu: 67074,
-  "priyanshu singh": 67074,
-  priyanshusingh1234: 67074,
-};
+/**
+ * Fetch stats from Hackatime for a given user identifier (Slack ID, numeric ID, or username)
+ */
+async function fetchHackatimeStats(identifier: string) {
+  try {
+    const statsUrl = `https://hackatime.hackclub.com/api/v1/users/${encodeURIComponent(identifier)}/stats?features=projects`;
+    const res = await fetch(statsUrl, {
+      headers: { Accept: "application/json" },
+      next: { revalidate: 60 },
+    });
 
-async function resolveHackatimeUserId(identifier: string): Promise<number | null> {
-  const clean = identifier.trim().toLowerCase();
+    if (!res.ok) {
+      return null;
+    }
 
-  // 1. Direct numeric ID
-  if (/^\d+$/.test(clean)) {
-    return parseInt(clean, 10);
+    const data = await res.json();
+    return data?.data || null;
+  } catch (err) {
+    return null;
   }
+}
 
-  // 2. Known mapping or default
-  if (clean === "default" || clean === "" || KNOWN_HACKATIME_IDS[clean]) {
-    return KNOWN_HACKATIME_IDS[clean] || 67074;
-  }
+/**
+ * Find user's numeric ID on Hackatime via leaderboard search using their username or Slack handle
+ */
+async function findUserIdOnHackatime(searchKey: string): Promise<string | number | null> {
+  const clean = searchKey.trim().toLowerCase();
+  if (!clean) return null;
 
-  // 3. Query Hackatime leaderboard to find user's numeric ID
   try {
     const lbRes = await fetch("https://hackatime.hackclub.com/api/v1/leaderboard", {
       headers: { Accept: "application/json" },
-      next: { revalidate: 300 }, // cache for 5 minutes
+      next: { revalidate: 180 },
     });
 
     if (lbRes.ok) {
       const data = await lbRes.json();
       const entries = data?.entries || [];
       const match = entries.find((e: any) => {
-        const u = e?.user?.username?.toLowerCase() || "";
-        return u === clean || (clean.length >= 3 && u.includes(clean));
+        const u = (e?.user?.username || "").toLowerCase();
+        const n = (e?.user?.name || "").toLowerCase();
+        return u === clean || n === clean || (clean.length >= 4 && (u.includes(clean) || clean.includes(u)));
       });
 
       if (match?.user?.id) {
@@ -103,35 +113,89 @@ async function resolveHackatimeUserId(identifier: string): Promise<number | null
       }
     }
   } catch (err) {
-    console.error("Leaderboard lookup failed:", err);
+    console.warn("Hackatime directory search notice:", err);
   }
 
-  // Fallback to 67074
-  return 67074;
+  return null;
 }
 
 export async function GET(request: Request) {
   try {
+    // 1. Get the authenticated user from the active NextAuth session
+    const session = await getServerSession(authOptions);
+
+    // 2. Read any manual lookup ID passed by the user (e.g. typing a custom ID/username in the UI)
     const { searchParams } = new URL(request.url);
-    const identifier = searchParams.get("slackId") || searchParams.get("userId") || searchParams.get("username") || "default";
+    const manualLookup = searchParams.get("userId") || searchParams.get("target") || "";
 
-    const userId = await resolveHackatimeUserId(identifier) || 67074;
+    // 3. Extract the authenticated user's Slack ID and username
+    const authSlackId = (session?.user as any)?.slack_id || (session?.user as any)?.id || searchParams.get("slackId") || "";
+    const authUsername = session?.user?.name || searchParams.get("username") || "";
 
-    // Fetch projects directly from Hackatime API
-    const statsUrl = `https://hackatime.hackclub.com/api/v1/users/${userId}/stats?features=projects`;
-    const res = await fetch(statsUrl, {
-      headers: { Accept: "application/json" },
-      next: { revalidate: 60 },
-    });
+    // Candidate identifiers to try for THIS authenticated user in priority order:
+    const candidates: string[] = [];
 
-    if (!res.ok) {
-      throw new Error(`Hackatime API responded with status ${res.status}`);
+    if (manualLookup.trim()) {
+      candidates.push(manualLookup.trim());
     }
 
-    const data = await res.json();
-    const rawProjects = data?.data?.projects || [];
+    if (authSlackId) {
+      candidates.push(authSlackId.toString().trim());
+    }
 
-    // Filter, format, and sort by tracked hours (highest first)
+    if (authUsername) {
+      candidates.push(authUsername.toString().trim());
+      // Also try with spaces stripped or replaced with underscores
+      if (authUsername.includes(" ")) {
+        candidates.push(authUsername.replace(/\s+/g, "").toLowerCase());
+        candidates.push(authUsername.replace(/\s+/g, "_").toLowerCase());
+      }
+    }
+
+    if (candidates.length === 0) {
+      return NextResponse.json({
+        totalProjects: 0,
+        projects: [],
+        message: "No authenticated user session found.",
+      });
+    }
+
+    // Try fetching stats directly using the user's candidates
+    let statsData: any = null;
+    let resolvedIdentifier: string = "";
+
+    for (const cand of candidates) {
+      statsData = await fetchHackatimeStats(cand);
+      if (statsData?.projects) {
+        resolvedIdentifier = cand;
+        break;
+      }
+    }
+
+    // If direct fetch didn't return projects, attempt leaderboard directory resolution for this user's username
+    if (!statsData?.projects && authUsername) {
+      const matchedId = await findUserIdOnHackatime(authUsername);
+      if (matchedId) {
+        statsData = await fetchHackatimeStats(String(matchedId));
+        if (statsData?.projects) {
+          resolvedIdentifier = String(matchedId);
+        }
+      }
+    }
+
+    // If no projects found on Hackatime for this user, return clean empty list
+    if (!statsData || !Array.isArray(statsData.projects)) {
+      return NextResponse.json({
+        hackatimeId: null,
+        username: authUsername || "user",
+        totalProjects: 0,
+        projects: [],
+        message: "No Hackatime projects tracked yet for your account. You can enter your project folder name manually.",
+      });
+    }
+
+    // Format, filter, and sort projects for this user
+    const rawProjects = statsData.projects || [];
     const projects = rawProjects
       .filter((p: any) => {
         const name = p?.name?.trim();
@@ -153,35 +217,17 @@ export async function GET(request: Request) {
       .sort((a: any, b: any) => b.total_seconds - a.total_seconds);
 
     return NextResponse.json({
-      hackatimeId: userId,
-      username: data?.data?.username || "hackclubber",
+      hackatimeId: resolvedIdentifier || null,
+      username: statsData?.username || authUsername,
       totalProjects: projects.length,
       projects,
     });
   } catch (err: any) {
-    console.error("Hackatime projects error:", err);
-
-    // Reliable fallback projects with real statistics
+    console.error("Hackatime projects API error:", err);
     return NextResponse.json({
-      hackatimeId: 67074,
-      username: "kpk22128",
-      projects: [
-        { name: "dheeyudhha", total_seconds: 447754, hours: 124.4, text: "124.4 hrs" },
-        { name: "personal site", total_seconds: 13401, hours: 3.7, text: "3.7 hrs" },
-        { name: "pages", total_seconds: 8160, hours: 2.3, text: "2.3 hrs" },
-        { name: "newday-next", total_seconds: 7186, hours: 2.0, text: "2.0 hrs" },
-        { name: "nasa-apod-site", total_seconds: 4976, hours: 1.4, text: "1.4 hrs" },
-        { name: "faulty site", total_seconds: 3913, hours: 1.1, text: "1.1 hrs" },
-        { name: "donypolo", total_seconds: 3760, hours: 1.0, text: "1.0 hrs" },
-        { name: "SkillSwap", total_seconds: 3580, hours: 1.0, text: "1.0 hrs" },
-        { name: "StudentOS", total_seconds: 3254, hours: 0.9, text: "0.9 hrs" },
-        { name: "web os", total_seconds: 3253, hours: 0.9, text: "0.9 hrs" },
-        { name: "collab", total_seconds: 2674, hours: 0.7, text: "0.7 hrs" },
-        { name: "blare", total_seconds: 2575, hours: 0.7, text: "0.7 hrs" },
-        { name: "noflop", total_seconds: 2370, hours: 0.7, text: "0.7 hrs" },
-        { name: "rk-english-experts", total_seconds: 1703, hours: 0.5, text: "0.5 hrs" },
-      ],
-      isFallback: true,
+      totalProjects: 0,
+      projects: [],
+      error: "Failed to connect to Hackatime API.",
     });
   }
 }

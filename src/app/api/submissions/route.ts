@@ -69,21 +69,18 @@ export async function GET(request: Request) {
       }
     }
 
-    // Filter by user if requested
+    // Strict user isolation: if any user filter is requested, match ONLY that exact user
+    const hasFilter = Boolean(userQuery || slackIdQuery || emailQuery);
     const filtered = allReal.filter((s) => {
-      if (!userQuery && !slackIdQuery && !emailQuery) return true;
+      if (!hasFilter) return true;
 
-      const name = (s.user_name || "").toLowerCase();
-      const slackId = (s.user_slack_id || "").toLowerCase();
-      const email = (s.user_email || "").toLowerCase();
+      const sName = (s.user_name || "").toLowerCase().trim();
+      const sSlackId = (s.user_slack_id || "").toLowerCase().trim();
+      const sEmail = (s.user_email || "").toLowerCase().trim();
 
-      if (slackIdQuery && slackId && slackId === slackIdQuery) return true;
-      if (emailQuery && email && email === emailQuery) return true;
-      if (userQuery) {
-        if (name === userQuery || name.includes(userQuery) || userQuery.includes(name)) return true;
-        if (slackId === userQuery) return true;
-        if (email.split("@")[0] === userQuery) return true;
-      }
+      if (slackIdQuery && sSlackId && sSlackId === slackIdQuery) return true;
+      if (emailQuery && sEmail && sEmail === emailQuery) return true;
+      if (userQuery && sName && (sName === userQuery || sName === userQuery.replace(/_/g, " "))) return true;
 
       return false;
     });

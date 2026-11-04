@@ -299,7 +299,7 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
             </p>
 
             <div className="wobbly-card p-5 max-w-xl bg-white text-base text-[#242636] font-medium leading-relaxed shadow-[5px_5px_0px_#181926]">
-              tired of building stuff that dies in a github graveyard? pick any tech stack, build software people actually want, pitch your idea, and get <strong>$100 seed micro-funding</strong> via Hack Club Bank. then spend 3-4 months growing it into a real business!
+              tired of building stuff that dies in a github graveyard? pick any tech stack, build software people actually want, pitch your idea, and get <strong>seed micro-funding</strong> via Hack Club Bank. then spend 3-4 months growing it into a real business!
             </div>
 
             <div className="flex flex-wrap items-center gap-3 pt-2">
@@ -308,7 +308,7 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                 className="fortune-btn fortune-btn-gold text-base inline-flex items-center gap-2 group hover:scale-105 transition-all"
               >
                 <Power className="w-4 h-4 text-[#ec3750] group-hover:scale-110 transition-transform" />
-                <span>Start PC &amp; Ship for $100</span>
+                <span>Start PC</span>
               </button>
 
               <a
@@ -344,10 +344,10 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                 <Check className="w-3 h-3" /> 100% free for teens
               </span>
               <span className="bg-white px-2.5 py-1 border-2 border-dashed border-[#10b981] text-[#10b981] rounded rotate-[1deg] inline-flex items-center gap-1 shadow-sm">
-                <Check className="w-3 h-3" /> $100 seed funding
+                <Check className="w-3 h-3" /> seed micro-funding
               </span>
               <span className="bg-white px-2.5 py-1 border-2 border-dashed border-[#f59e0b] text-[#b37700] rounded rotate-[-0.5deg] inline-flex items-center gap-1 shadow-sm">
-                <Check className="w-3 h-3" /> top 5 win hardware
+                <Check className="w-3 h-3" /> top 5 win cool prizes
               </span>
             </div>
           </div>
@@ -401,7 +401,7 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                     <div className="pt-2">
                       <div className="bg-[#ec3750] group-hover:bg-[#d6253e] text-white font-pixel text-xs sm:text-sm font-bold py-3 px-4 rounded-xl border-2 border-white shadow-[3px_3px_0px_#000] inline-flex items-center gap-2 group-hover:scale-105 transition-all">
                         <Power className="w-4 h-4 animate-pulse" />
-                        <span>[ CLICK TO START PC ]</span>
+                        <span>[ START PC ]</span>
                       </div>
                     </div>
 
@@ -550,7 +550,7 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                       Fortune 1.0
                     </h1>
                     <p className="font-doodle text-sm sm:text-base text-gray-300">
-                      Code software • Claim $100 seed grant • Build a real business
+                      Code software • Claim seed grant • Build a real business
                     </p>
                   </div>
 
@@ -562,7 +562,7 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                         className="bg-[#10b981] hover:bg-[#059669] text-white font-pixel text-sm sm:text-base font-bold py-3.5 px-6 rounded-xl border-2 border-white shadow-[4px_4px_0px_#000] transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
                       >
                         <Power className="w-4 h-4" />
-                        <span>Launch Workstation (Boot OS)</span>
+                        <span>Launch PC</span>
                       </button>
                     ) : (
                       <button
@@ -570,7 +570,7 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                         className="bg-[#ec3750] hover:bg-[#d6253e] text-white font-pixel text-sm sm:text-base font-bold py-3.5 px-6 rounded-xl border-2 border-white shadow-[4px_4px_0px_#000] transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
                       >
                         <LogIn className="w-4 h-4" />
-                        <span>Connect Slack to Boot</span>
+                        <span>Connect Slack</span>
                       </button>
                     )}
 
@@ -591,7 +591,7 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                 <div className="font-pixel text-[11px] text-gray-400 flex flex-wrap justify-center gap-4 mt-8">
                   <span>Track coding on Hackatime</span>
                   <span>•</span>
-                  <span>$100 HCB Grants</span>
+                  <span>HCB Seed Grants</span>
                   <span>•</span>
                   <span>0% Equity</span>
                 </div>
@@ -677,7 +677,7 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                           </div>
                         </div>
                         <span className="bg-[#dcfce7] text-[#15803d] border border-[#15803d]/40 px-2 py-0.5 rounded text-[10px] font-bold">
-                          FORTUNE $100
+                          FORTUNE SEED
                         </span>
                       </div>
 
@@ -707,8 +707,8 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                           {isApproved ? (
                             <>
                               <div className="text-[9px] text-[#10b981] font-bold uppercase">GRANTED MONEY</div>
-                              <div className="text-base sm:text-lg font-bold text-[#10b981] font-mono leading-tight">
-                                $100.00
+                              <div className="text-sm sm:text-base font-bold text-[#10b981] font-mono leading-tight">
+                                SEED GRANT
                               </div>
                               <div className="text-[8px] text-gray-400 font-mono">HCB DISBURSED</div>
                             </>
@@ -887,7 +887,7 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                           </div>
                           <h3 className="font-sans font-black text-2xl sm:text-3xl">Ready to ship to Step 1 Review?</h3>
                           <p className="font-doodle text-sm sm:text-base text-gray-600">
-                            Our review team (@Noben_Nobi &amp; organizers) checks your working demo and opens your $100 HCB seed grant.
+                            Our review team (@Noben_Nobi &amp; organizers) checks your working demo and opens your HCB seed grant.
                           </p>
                           <div className="pt-2">
                             <Link
@@ -895,7 +895,7 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                               className="fortune-btn fortune-btn-gold text-sm flex items-center justify-center gap-2 py-3.5 shadow-[4px_4px_0px_#181926]"
                             >
                               <ExternalLink className="w-4 h-4" />
-                              <span>Open Founder Shipping Dashboard</span>
+                              <span>Open Dashboard</span>
                             </Link>
                           </div>
                         </div>
@@ -910,7 +910,7 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                               <span>Fortune Hardware &amp; Rewards Store</span>
                             </h3>
                             <p className="font-doodle text-sm sm:text-base text-gray-600 mt-1">
-                              Convert verified startup revenue into Fortune Points or win Top 5 Demo Day grand prizes!
+                              Convert verified startup revenue into Fortune Points or win Top 5 Demo Day prizes!
                             </p>
                             <div className="inline-flex items-center gap-2 mt-2 bg-[#ffe066] border border-[#181926] px-3 py-1 rounded-full font-pixel text-[11px] font-bold text-[#181926]">
                               <span>$1 Revenue = 10 Fortune Points</span>
@@ -1102,7 +1102,7 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
 
                           </div>
 
-                          {/* Top 5 Grand Prize Banner */}
+                          {/* Top 5 Prizes Banner */}
                           <div className="bg-white border-2 border-[#181926] rounded-xl p-4 shadow-[3px_3px_0px_#181926] text-left flex flex-col sm:flex-row items-center justify-between gap-3 mt-4">
                             <div className="flex items-center gap-3">
                               <div className="w-10 h-10 rounded-xl bg-[#ffe066] border-2 border-[#181926] flex items-center justify-center text-[#181926]">
@@ -1110,10 +1110,10 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                               </div>
                               <div>
                                 <h4 className="font-sans font-black text-base text-[#181926]">
-                                  Top 5 Demo Day Grand Prizes
+                                  Top 5 Demo Day Prizes
                                 </h4>
                                 <p className="font-doodle text-xs text-gray-600">
-                                  The highest-traction teenage founders win <strong>$1,000 cash seed grants</strong>, <strong>MacBook Airs</strong>, and the <strong>Golden Fortune Trophy</strong>!
+                                  The highest-traction teenage founders win <strong>cool prizes</strong> and recognition on Demo Day!
                                 </p>
                               </div>
                             </div>
@@ -1140,7 +1140,7 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                               How Fortune Works from 0 to 1
                             </h3>
                             <p className="font-doodle text-xs sm:text-sm text-gray-600 mt-1">
-                              Code real software, pass Step 1 Review for $100 seed grant, and build real revenue!
+                              Code real software, pass Step 1 Review for seed micro-funding, and build real revenue!
                             </p>
                           </div>
 
@@ -1162,9 +1162,9 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                                 <span>STEP 02</span>
                                 <span>MICRO-GRANT</span>
                               </div>
-                              <h4 className="font-sans font-black text-base text-[#181926] mb-1">Submit &amp; Get $100</h4>
+                              <h4 className="font-sans font-black text-base text-[#181926] mb-1">Submit &amp; Get Funded</h4>
                               <p className="text-xs text-[#4a4e66] leading-relaxed">
-                                Submit your pitch and GitHub demo to Step 1 Review. Once approved, we issue a $100 HCB grant with 0% equity to fund domains and APIs.
+                                Submit your pitch and GitHub demo to Step 1 Review. Once approved, we issue an HCB seed grant with 0% equity to fund domains and APIs.
                               </p>
                             </div>
 
@@ -1284,7 +1284,7 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                               rel="noopener noreferrer"
                               className="fortune-btn text-xs py-2.5 shadow-[2px_2px_0px_#181926]"
                             >
-                              Join #fortune (Chat &amp; Brainstorm) ↗
+                              Join #fortune ↗
                             </a>
                             <a
                               href="https://hackclub.slack.com/messages/fortune-help"
@@ -1292,7 +1292,7 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                               rel="noopener noreferrer"
                               className="fortune-btn fortune-btn-gold text-xs py-2.5 shadow-[2px_2px_0px_#181926]"
                             >
-                              Join #fortune-help (Organizer Support) ↗
+                              Join #fortune-help ↗
                             </a>
                           </div>
                         </div>
@@ -1335,25 +1335,25 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                               onClick={() => { setActiveWindow("roadmap"); setStartMenuOpen(false); }}
                               className="w-full text-left p-1.5 rounded hover:bg-[#ffe066] flex items-center gap-2"
                             >
-                              <Map className="w-3.5 h-3.5" /> <span>Roadmap &amp; Calculator</span>
+                              <Map className="w-3.5 h-3.5" /> <span>Roadmap</span>
                             </button>
                             <button
                               onClick={() => { setActiveWindow("shop"); setStartMenuOpen(false); }}
                               className="w-full text-left p-1.5 rounded hover:bg-[#ffe066] flex items-center gap-2"
                             >
-                              <ShoppingBag className="w-3.5 h-3.5" /> <span>Rewards Shop</span>
+                              <ShoppingBag className="w-3.5 h-3.5" /> <span>Shop</span>
                             </button>
                             <button
                               onClick={() => { setActiveWindow("chat"); setStartMenuOpen(false); }}
                               className="w-full text-left p-1.5 rounded hover:bg-[#ffe066] flex items-center gap-2"
                             >
-                              <MessageSquare className="w-3.5 h-3.5" /> <span>Slack Discussion</span>
+                              <MessageSquare className="w-3.5 h-3.5" /> <span>Slack</span>
                             </button>
                             <button
                               onClick={() => { setActiveWindow("faq"); setStartMenuOpen(false); }}
                               className="w-full text-left p-1.5 rounded hover:bg-[#ffe066] flex items-center gap-2"
                             >
-                              <HelpCircle className="w-3.5 h-3.5" /> <span>FAQ &amp; Rules</span>
+                              <HelpCircle className="w-3.5 h-3.5" /> <span>FAQ</span>
                             </button>
                             
                             <div className="border-t border-[#181926]/20 my-1 pt-1">

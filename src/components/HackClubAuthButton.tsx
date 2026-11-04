@@ -56,7 +56,7 @@ export default function HackClubAuthButton() {
       className="bg-[#ec3750] hover:bg-[#d6253e] text-white px-3 py-1.5 rounded-md border-2 border-[#181926] shadow-[2px_2px_0px_#181926] font-pixel text-xs font-bold flex items-center gap-1.5 transition-transform hover:-translate-y-0.5 active:translate-y-0.5"
     >
       <LogIn className="w-3.5 h-3.5" />
-      <span>Sign in with Hack Club</span>
+      <span>Sign In</span>
     </button>
   );
 }

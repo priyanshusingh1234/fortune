@@ -45,7 +45,7 @@ export const FORTUNE_FAQS = [
   },
   {
     q: "What happens in Step 2 Review after 3-4 months?",
-    a: "At the end of the sprint, our team reviews all active businesses, user traction, and verified earnings. The Top 5 Best Businesses win massive Grand Prizes (hardware grants, founder reviews, golden trophies)! Everyone else converts their revenue into Fortune Points for shop loot.",
+    a: "At the end of the sprint, our team reviews all active businesses, user traction, and verified earnings. The Top 5 Best Businesses win cool prizes and founder reviews! Everyone else converts their revenue into Fortune Points for shop loot.",
     isOpen: false,
   },
   {

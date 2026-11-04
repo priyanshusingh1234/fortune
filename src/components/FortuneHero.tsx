@@ -118,14 +118,14 @@ export default function FortuneHero() {
                 href="/dashboard"
                 className="fortune-btn fortune-btn-gold text-base inline-flex items-center gap-2"
               >
-                <Zap className="w-4 h-4" /> Open Founder Dashboard
+                <Zap className="w-4 h-4" /> Open Dashboard
               </Link>
             ) : (
               <button
                 onClick={() => signIn("hackclub")}
                 className="fortune-btn fortune-btn-gold text-base inline-flex items-center gap-2"
               >
-                <Zap className="w-4 h-4" /> Start Shipping for $100
+                <Zap className="w-4 h-4" /> Start Shipping
               </button>
             )}
 

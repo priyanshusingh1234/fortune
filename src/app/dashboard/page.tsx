@@ -111,7 +111,7 @@ export default function DashboardPage() {
         projectTitle,
         projectStatus,
         isDeleting: false,
-        error: "Approved projects cannot be deleted as their $100 seed grant has already been disbursed/authorized.",
+        error: "Approved projects cannot be deleted as their seed grant has already been disbursed/authorized.",
       });
       return;
     }
@@ -414,7 +414,7 @@ export default function DashboardPage() {
               className="fortune-btn fortune-btn-gold w-full text-base inline-flex items-center justify-center gap-2"
             >
               <LogIn className="w-4 h-4" />
-              <span>Sign in with Hack Club</span>
+              <span>Sign In</span>
             </button>
           </div>
           <div>

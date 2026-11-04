@@ -446,20 +446,20 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
 
   // Fullscreen Workstation Mode (For Logged-In Authenticated Founders)
   return (
-    <section className="w-full h-full flex flex-col p-1 sm:p-2 bg-[#1b1c24] overflow-hidden">
+    <section className="w-full h-full flex flex-col p-1 sm:p-2 bg-transparent overflow-hidden crt-bulge-stage">
       
       {/* Main Retro Monitor Chassis Container */}
-      <div className="flex-1 min-h-0 flex flex-col w-full">
+      <div className="flex-1 min-h-0 flex flex-col w-full max-w-[1550px] mx-auto">
         
         {/* Retro Macintosh / CRT Bezel (Warm Beige #e8dec0) */}
         <div className={
           fullscreen
-            ? "bg-[#e8dec0] p-2 sm:p-3 rounded-xl sm:rounded-2xl border-4 border-[#181926] shadow-2xl relative flex-1 min-h-0 flex flex-col overflow-hidden"
+            ? "crt-bulge-chassis p-2.5 sm:p-3.5 relative flex-1 min-h-0 flex flex-col overflow-hidden"
             : "bg-[#e8dec0] p-4 sm:p-7 rounded-[28px] border-4 border-[#181926] shadow-[10px_10px_0px_#181926] relative"
         }>
           
           {/* Top Monitor Bezel Bar */}
-          <div className="flex items-center justify-between pb-2 px-2 border-b-2 border-[#181926]/10 mb-2 font-pixel text-[11px] text-[#5c503b] shrink-0">
+          <div className="flex items-center justify-between pb-1.5 px-2 border-b-2 border-[#181926]/10 mb-1.5 font-pixel text-[11px] text-[#5c503b] shrink-0">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-[#181926]/40 inline-block"></span>
               <span className="font-bold tracking-widest hidden sm:inline">FORTUNE 1994 CRT WORKSTATION</span>
@@ -514,16 +514,21 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
             </div>
           </div>
 
-          {/* CRT Monitor Screen Surface */}
+          {/* CRT Monitor Recessed Gasket & Bulged Screen Surface */}
           <div className={
             fullscreen
-              ? "flex-1 min-h-0 flex flex-col relative"
+              ? "crt-bulge-bezel flex-1 min-h-0 flex flex-col relative p-1.5 sm:p-2 bg-[#101118]"
               : "relative rounded-[16px] overflow-hidden border-4 border-[#2b2416] bg-[#0c0d14] shadow-inner"
           }>
-            
-            {/* Scanline CRT Retro Visual Effects */}
-            <div className="scanlines pointer-events-none z-10"></div>
-            <div className="crt-flicker pointer-events-none z-10"></div>
+            <div className={
+              fullscreen
+                ? "crt-bulge-glass flex-1 min-h-0 flex flex-col relative overflow-hidden"
+                : "flex-1 min-h-0 flex flex-col relative overflow-hidden"
+            }>
+              {/* Scanline CRT Retro Visual Effects */}
+              <div className="scanlines pointer-events-none z-10"></div>
+              <div className="crt-flicker pointer-events-none z-10"></div>
+              {fullscreen && <div className="crt-bulge-vignette"></div>}
 
             {/* 1. STATE: POWERED OFF / STANDBY SCREEN */}
             {osState === "off" && (
@@ -1457,17 +1462,52 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
               </div>
             )}
 
+          {/* End of CRT Screen Surfaces */}
+            </div>
           </div>
 
-          {/* Computer Stand / Base (Only rendered when not fullscreen) */}
-          {!fullscreen && (
-            <>
-              <div className="w-48 h-5 bg-[#d9cfb0] mx-auto border-x-4 border-b-4 border-[#181926] rounded-b-xl shadow-md mt-0"></div>
-              <div className="w-72 h-3 bg-[#c9bfa0] mx-auto border-4 border-[#181926] rounded-full shadow-lg"></div>
-            </>
-          )}
+          {/* Monitor Lower Chassis / Hardware Faceplate (Floppy, Knobs, Badge) */}
+          <div className="flex items-center justify-between pt-2 px-1 font-pixel text-[10px] text-[#786b51] shrink-0 border-t border-[#181926]/10 mt-1.5">
+            <div className="flex items-center gap-2">
+              {/* 3.5" Floppy Drive */}
+              <div className="bg-[#181926] w-22 sm:w-28 h-3.5 rounded-sm border border-black/40 flex items-center px-1.5 justify-between">
+                <span className="text-[7px] text-gray-400 font-mono">A:\ 1.44MB</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#10b981]/60"></span>
+              </div>
+              <span className="text-[9px] text-gray-600 font-bold hidden sm:inline">[EJECT]</span>
+            </div>
+
+            {/* Center Metal Badge */}
+            <div className="hidden md:flex items-center gap-1.5 bg-[#dfd4b7] border border-[#181926]/30 px-2 py-0.5 rounded shadow-inner text-[9px] font-bold text-[#5c503b]">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#ec3750]"></span>
+              <span>FORTUNE 1994 WORKSTATION • 14&quot; BULGED COLOR CRT</span>
+            </div>
+
+            {/* Rotary Controls & Power Switch */}
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 text-[8px] text-gray-500 font-bold">
+                <div className="w-3.5 h-3.5 rounded-full bg-[#181926]/30 border border-[#181926]" title="Brightness"></div>
+                <span className="hidden sm:inline">BRT</span>
+              </div>
+              <div className="flex items-center gap-1 text-[8px] text-gray-500 font-bold">
+                <div className="w-3.5 h-3.5 rounded-full bg-[#181926]/30 border border-[#181926]" title="Contrast"></div>
+                <span className="hidden sm:inline">CON</span>
+              </div>
+              <div 
+                onClick={() => signOut()}
+                className="w-5 h-5 rounded-md bg-[#ec3750] border-2 border-[#181926] flex items-center justify-center text-white text-[8px] font-bold cursor-pointer hover:bg-[#d6253e]"
+                title="Shut down & Sign out"
+              >
+                PWR
+              </div>
+            </div>
+          </div>
 
         </div>
+
+        {/* Computer Stand / Base (Physical Foot) */}
+        <div className="w-48 sm:w-56 h-3 bg-[#d4c9a8] mx-auto border-x-4 border-b-4 border-[#181926] rounded-b-xl shadow-md shrink-0"></div>
+        <div className="w-72 sm:w-84 h-2 bg-[#c4b998] mx-auto border-2 border-[#181926] rounded-full shadow-lg shrink-0"></div>
 
         {/* Animated Downward Arrow Indicator (Only when non-fullscreen) */}
         {!fullscreen && scrollPrompt && (

@@ -14,7 +14,7 @@ export default function HomeContent() {
   // When logged in: fullscreen retro computer ONLY (no top names, no bottom sections, all apps inside PC)
   if (isLoggedIn) {
     return (
-      <main className="fixed inset-0 z-50 w-screen h-screen bg-[#1b1c24] overflow-hidden flex flex-col">
+      <main className="fixed inset-0 z-50 w-screen h-screen bg-[#12131b] overflow-hidden flex flex-col p-1.5 sm:p-2 md:p-3">
         <RetroComputerHero fullscreen={true} />
       </main>
     );

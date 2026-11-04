@@ -180,3 +180,79 @@ input[type="radio"] {
 .crt-phosphor-glow {
   animation: crt-glow 2.5s infinite ease-in-out;
 }
+
+/* 3D Bulged-Out CRT Workstation Chassis (Post-Login & Fullscreen Mode) */
+.crt-bulge-stage {
+  perspective: 1600px;
+  perspective-origin: 50% 45%;
+}
+
+.crt-bulge-chassis {
+  transform-style: preserve-3d;
+  transform: perspective(1600px) rotateX(1.2deg);
+  background: #e8dec0;
+  border-top: 5px solid #f6f0df;
+  border-left: 5px solid #ede4d1;
+  border-right: 5px solid #cfc4a9;
+  border-bottom: 9px solid #b3a689;
+  box-shadow: 
+    0 4px 0 #b3a689,
+    0 8px 0 #9c9075,
+    0 14px 0 #7e735b,
+    0 22px 45px rgba(0, 0, 0, 0.75),
+    inset 0 2px 4px rgba(255, 255, 255, 0.6);
+  border-radius: 26px;
+  position: relative;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+/* Dark recessed molded bezel gasket surrounding the glass */
+.crt-bulge-bezel {
+  background: #181924;
+  border: 8px solid #2b251a;
+  border-radius: 24px;
+  box-shadow: 
+    inset 0 6px 16px rgba(0, 0, 0, 0.95),
+    inset 0 -2px 6px rgba(255, 255, 255, 0.08),
+    0 2px 4px rgba(0, 0, 0, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Bulged-out curved CRT screen glass surface with spherical barrel glare */
+.crt-bulge-glass {
+  border-radius: 18px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 
+    inset 0 0 70px rgba(0, 0, 0, 0.85),
+    inset 0 0 25px rgba(0, 0, 0, 0.95),
+    inset 0 2px 5px rgba(255, 255, 255, 0.15);
+}
+
+/* Authentic spherical glass bulge specular glare reflection */
+.crt-bulge-glass::before {
+  content: " ";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 38;
+  background: 
+    radial-gradient(ellipse 110% 65% at 50% 10%, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.03) 40%, rgba(0, 0, 0, 0) 70%),
+    radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0) 65%, rgba(0, 0, 0, 0.3) 85%, rgba(0, 0, 0, 0.7) 100%),
+    linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%);
+  background-size: 100% 100%, 100% 100%, 100% 3px;
+  border-radius: inherit;
+}
+
+/* Heavy CRT corner vignette for spherical bulge illusion */
+.crt-bulge-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 39;
+  border-radius: inherit;
+  box-shadow: 
+    inset 0 0 60px rgba(0, 0, 0, 0.65),
+    inset 0 0 25px rgba(0, 0, 0, 0.85);
+}

@@ -13,7 +13,7 @@ export default function SkyLandingPage() {
   // Fun, rotating startup fortunes that stream out of the cookie
   const fortunes = [
     "★ HACK CLUB YSWS • WE FUND YOUR CODE ★",
-    "★ 10,000 USERS ARE WAITING • SHIP IT! ★",
+    "★ 32 USERS ARE WAITING • SHIP IT! ★",
     "★ STOP LETTING CODE DIE IN GITHUB GRAVEYARDS ★",
     "★ 100% FREE FOR TEENS • GET SEED FUNDED ★",
     "★ BUILD SOFTWARE PEOPLE WANT • WE FUND IT ★",

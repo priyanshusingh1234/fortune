@@ -56,8 +56,8 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
     }, 1200);
   };
 
-  // OS State: "off" | "booting" | "desktop"
-  const [osState, setOsState] = useState<"off" | "booting" | "desktop">("off");
+  // OS State: "off" | "booting" | "desktop" (Directly boot to desktop when authenticated/fullscreen)
+  const [osState, setOsState] = useState<"off" | "booting" | "desktop">(fullscreen ? "desktop" : "off");
   const [bootStep, setBootStep] = useState(0);
   const [activeWindow, setActiveWindow] = useState<"ship" | "shop" | "chat" | "faq" | "roadmap" | null>(null);
   const [startMenuOpen, setStartMenuOpen] = useState(false);
@@ -328,7 +328,7 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
               </a>
 
               <a
-                href="https://hackclub.slack.com/messages/fortune"
+                href="https://app.slack.com/client/E09V59WQY1E/C0CBJ54GYMQ"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="font-doodle text-lg font-bold text-[#ec3750] hover:underline rotate-[-1deg] inline-flex items-center gap-1 ml-1"
@@ -446,93 +446,86 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
 
   // Fullscreen Workstation Mode (For Logged-In Authenticated Founders)
   return (
-    <section className="w-full h-full flex flex-col p-1 sm:p-2 bg-transparent overflow-hidden crt-bulge-stage">
+    <section className="w-full h-full flex flex-col p-1 sm:p-2 bg-transparent overflow-hidden crt-3d-stage">
       
-      {/* Main Retro Monitor Chassis Container */}
-      <div className="flex-1 min-h-0 flex flex-col w-full max-w-[1550px] mx-auto">
+      {/* 3D Monitor Chassis */}
+      <div className="crt-3d-monitor-chassis p-2.5 sm:p-3 relative flex-1 min-h-0 flex flex-col overflow-hidden">
         
-        {/* Retro Macintosh / CRT Bezel (Warm Beige #e8dec0) */}
-        <div className={
-          fullscreen
-            ? "crt-bulge-chassis p-2.5 sm:p-3.5 relative flex-1 min-h-0 flex flex-col overflow-hidden"
-            : "bg-[#e8dec0] p-4 sm:p-7 rounded-[28px] border-4 border-[#181926] shadow-[10px_10px_0px_#181926] relative"
-        }>
-          
-          {/* Top Monitor Bezel Bar */}
-          <div className="flex items-center justify-between pb-1.5 px-2 border-b-2 border-[#181926]/10 mb-1.5 font-pixel text-[11px] text-[#5c503b] shrink-0">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#181926]/40 inline-block"></span>
-              <span className="font-bold tracking-widest hidden sm:inline">FORTUNE 1994 CRT WORKSTATION</span>
-              <span className="font-bold tracking-widest sm:hidden">FORTUNE CRT</span>
-            </div>
+        {/* Top Monitor Bezel Bar */}
+        <div className="flex items-center justify-between pb-1.5 px-2 border-b-2 border-[#181926]/10 mb-1.5 font-pixel text-[11px] text-[#5c503b] shrink-0">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#181926]/40 inline-block"></span>
+            <span className="font-bold tracking-widest hidden sm:inline">FORTUNE CRT WORKSTATION</span>
+            <span className="font-bold tracking-widest sm:hidden">FORTUNE CRT</span>
             
-            <div className="flex items-center gap-2 sm:gap-3">
-              {isAdmin && (
-                <Link
-                  href="/admin"
-                  className="bg-[#181926] text-white px-2 py-0.5 rounded border border-[#ec3750] text-[10px] font-bold hover:bg-[#333] flex items-center gap-1"
-                  title="Open Admin Panel (Restricted to U0BTDMCJ6P7)"
-                >
-                  <Shield className="w-3 h-3 text-[#ffe066]" />
-                  <span>Admin</span>
-                </Link>
-              )}
-              {session?.user && (
-                <Link
-                  href="/dashboard"
-                  className="bg-[#ffe066] text-[#181926] px-2 py-0.5 rounded border border-[#181926] text-[10px] font-bold hover:bg-[#ffd533] flex items-center gap-1"
-                  title="Open Founder Dashboard"
-                >
-                  <LayoutDashboard className="w-3 h-3" />
-                  <span>Dashboard</span>
-                </Link>
-              )}
-
-              <span className="hidden md:inline">640x480 MATRIX</span>
-              
-              {/* Power LED & Logout */}
-              <div className="flex items-center gap-1.5">
-                <span className={`w-2.5 h-2.5 rounded-full transition-all ${
-                  osState !== "off"
-                    ? "bg-[#10b981] shadow-[0_0_8px_#10b981]"
-                    : "bg-[#ec3750]/40"
-                }`}></span>
-                <span className="text-[10px] font-bold hidden sm:inline">
-                  {osState !== "off" ? "PWR ON" : "STANDBY"}
+            <div className="hidden md:flex items-center gap-1.5 pl-2 border-l border-[#181926]/20">
+              {session?.user?.image ? (
+                <img
+                  src={session.user.image}
+                  alt={session.user.name || "User"}
+                  className="w-4 h-4 rounded-full border border-gray-600 object-cover"
+                />
+              ) : (
+                <span className="w-4 h-4 rounded-full bg-[#ec3750] text-white flex items-center justify-center text-[9px] font-bold">
+                  h
                 </span>
-
-                {session?.user && (
-                  <button
-                    onClick={() => signOut()}
-                    className="text-[#ec3750] hover:underline font-bold text-[10px] ml-1"
-                    title="Sign out of Fortune"
-                  >
-                    [LOG OUT]
-                  </button>
-                )}
-              </div>
+              )}
+              <span className="text-[10px] text-[#5c503b] font-bold">
+                @{session?.user?.name || "clubber"}
+              </span>
             </div>
           </div>
+          
+          <div className="flex items-center gap-2 sm:gap-3">
+            {isAdmin && (
+              <Link
+                href="/admin"
+                className="bg-[#181926] text-white px-2 py-0.5 rounded border border-[#ec3750] text-[10px] font-bold hover:bg-[#333] flex items-center gap-1"
+                title="Open Admin Panel"
+              >
+                <Shield className="w-3 h-3 text-[#ffe066]" />
+                <span>Admin</span>
+              </Link>
+            )}
+            <Link
+              href="/dashboard"
+              className="bg-[#ffe066] text-[#181926] px-2 py-0.5 rounded border border-[#181926] text-[10px] font-bold hover:bg-[#ffd533] flex items-center gap-1"
+              title="Open Founder Dashboard"
+            >
+              <LayoutDashboard className="w-3 h-3" />
+              <span>Dashboard</span>
+            </Link>
 
-          {/* CRT Monitor Recessed Gasket & Bulged Screen Surface */}
-          <div className={
-            fullscreen
-              ? "crt-bulge-bezel flex-1 min-h-0 flex flex-col relative p-1.5 sm:p-2 bg-[#101118]"
-              : "relative rounded-[16px] overflow-hidden border-4 border-[#2b2416] bg-[#0c0d14] shadow-inner"
-          }>
-            <div className={
-              fullscreen
-                ? "crt-bulge-glass flex-1 min-h-0 flex flex-col relative overflow-hidden"
-                : "flex-1 min-h-0 flex flex-col relative overflow-hidden"
-            }>
-              {/* Scanline CRT Retro Visual Effects */}
-              <div className="scanlines pointer-events-none z-10"></div>
-              <div className="crt-flicker pointer-events-none z-10"></div>
-              {fullscreen && <div className="crt-bulge-vignette"></div>}
+            {/* Power LED & Logout */}
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#10b981] shadow-[0_0_8px_#10b981]"></span>
+              <span className="text-[10px] font-bold hidden sm:inline text-[#10b981]">
+                ONLINE
+              </span>
+
+              <button
+                onClick={() => signOut()}
+                className="text-[#ec3750] hover:underline font-bold text-[10px] ml-1"
+                title="Sign out of Fortune"
+              >
+                [LOG OUT]
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Recessed Dark Bezel Gasket */}
+        <div className="crt-3d-bezel flex-1 min-h-0 flex flex-col relative p-1.5 sm:p-2 bg-[#12131c]">
+          
+          {/* Bulged Curved CRT Screen Glass Surface */}
+          <div className="crt-3d-glass flex-1 min-h-0 flex flex-col relative overflow-hidden">
+            
+            {/* CRT Corner Vignette overlay for spherical bulge depth */}
+            <div className="crt-3d-vignette pointer-events-none"></div>
 
             {/* 1. STATE: POWERED OFF / STANDBY SCREEN */}
             {osState === "off" && (
-              <div className="min-h-[460px] sm:min-h-[500px] bg-[#14151f] rounded-[12px] flex flex-col items-center justify-center p-6 text-center text-white relative">
+          <div className="flex-1 min-h-0 bg-[#14151f] flex flex-col items-center justify-center p-6 text-center text-white relative">
                 
                 {/* Background CRT phosphor grid texture */}
                 <div className="absolute inset-0 bg-[radial-gradient(#1f2238_1px,transparent_1px)] [background-size:16px_16px] opacity-40"></div>
@@ -581,7 +574,7 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
 
                     {/* Slack Channel Button */}
                     <a
-                      href="https://hackclub.slack.com/messages/fortune"
+                      href="https://app.slack.com/client/E09V59WQY1E/C0CBJ54GYMQ"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="bg-[#ffe066] hover:bg-[#ffd533] text-[#181926] font-pixel text-sm sm:text-base font-bold py-3.5 px-6 rounded-xl border-2 border-white shadow-[4px_4px_0px_#000] transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
@@ -644,11 +637,7 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
 
             {/* 3. STATE: THE RETRO COMPUTER DESKTOP WORKSPACE */}
             {osState === "desktop" && (
-              <div className={
-                fullscreen
-                  ? "flex-1 min-h-0 bg-[#22577a] rounded-[10px] sm:rounded-[12px] flex flex-col justify-between relative overflow-hidden select-none border-2 border-[#181926]"
-                  : "min-h-[520px] sm:min-h-[580px] bg-[#22577a] rounded-[12px] flex flex-col justify-between relative overflow-hidden select-none border-2 border-[#181926]"
-              }>
+              <div className="flex-1 min-h-0 bg-[#1a2e44] flex flex-col justify-between relative overflow-hidden select-none">
                 
                 {/* Desktop Wallpaper Texture */}
                 <div className="absolute inset-0 bg-[radial-gradient(#38a3a5_1px,transparent_1px)] [background-size:24px_24px] opacity-25 pointer-events-none"></div>
@@ -1284,7 +1273,7 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
                           </p>
                           <div className="flex flex-col gap-2 pt-2">
                             <a
-                              href="https://hackclub.slack.com/messages/fortune"
+                              href="https://app.slack.com/client/E09V59WQY1E/C0CBJ54GYMQ"
                               target="_blank"
                               rel="noopener noreferrer"
                               className="fortune-btn text-xs py-2.5 shadow-[2px_2px_0px_#181926]"
@@ -1462,66 +1451,9 @@ export default function RetroComputerHero({ fullscreen = false }: RetroComputerH
               </div>
             )}
 
-          {/* End of CRT Screen Surfaces */}
-            </div>
+          {/* End of 3D Bulged Glass, Bezel, and Monitor Chassis */}
           </div>
-
-          {/* Monitor Lower Chassis / Hardware Faceplate (Floppy, Knobs, Badge) */}
-          <div className="flex items-center justify-between pt-2 px-1 font-pixel text-[10px] text-[#786b51] shrink-0 border-t border-[#181926]/10 mt-1.5">
-            <div className="flex items-center gap-2">
-              {/* 3.5" Floppy Drive */}
-              <div className="bg-[#181926] w-22 sm:w-28 h-3.5 rounded-sm border border-black/40 flex items-center px-1.5 justify-between">
-                <span className="text-[7px] text-gray-400 font-mono">A:\ 1.44MB</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-[#10b981]/60"></span>
-              </div>
-              <span className="text-[9px] text-gray-600 font-bold hidden sm:inline">[EJECT]</span>
-            </div>
-
-            {/* Center Metal Badge */}
-            <div className="hidden md:flex items-center gap-1.5 bg-[#dfd4b7] border border-[#181926]/30 px-2 py-0.5 rounded shadow-inner text-[9px] font-bold text-[#5c503b]">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#ec3750]"></span>
-              <span>FORTUNE 1994 WORKSTATION • 14&quot; BULGED COLOR CRT</span>
-            </div>
-
-            {/* Rotary Controls & Power Switch */}
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1 text-[8px] text-gray-500 font-bold">
-                <div className="w-3.5 h-3.5 rounded-full bg-[#181926]/30 border border-[#181926]" title="Brightness"></div>
-                <span className="hidden sm:inline">BRT</span>
-              </div>
-              <div className="flex items-center gap-1 text-[8px] text-gray-500 font-bold">
-                <div className="w-3.5 h-3.5 rounded-full bg-[#181926]/30 border border-[#181926]" title="Contrast"></div>
-                <span className="hidden sm:inline">CON</span>
-              </div>
-              <div 
-                onClick={() => signOut()}
-                className="w-5 h-5 rounded-md bg-[#ec3750] border-2 border-[#181926] flex items-center justify-center text-white text-[8px] font-bold cursor-pointer hover:bg-[#d6253e]"
-                title="Shut down & Sign out"
-              >
-                PWR
-              </div>
-            </div>
-          </div>
-
         </div>
-
-        {/* Computer Stand / Base (Physical Foot) */}
-        <div className="w-48 sm:w-56 h-3 bg-[#d4c9a8] mx-auto border-x-4 border-b-4 border-[#181926] rounded-b-xl shadow-md shrink-0"></div>
-        <div className="w-72 sm:w-84 h-2 bg-[#c4b998] mx-auto border-2 border-[#181926] rounded-full shadow-lg shrink-0"></div>
-
-        {/* Animated Downward Arrow Indicator (Only when non-fullscreen) */}
-        {!fullscreen && scrollPrompt && (
-          <div className="flex flex-col items-center justify-center mt-6 animate-bounce transition-all">
-            <div className="bg-[#ffe066] text-[#181926] px-4 py-2 rounded-full border-3 border-[#181926] shadow-[4px_4px_0px_#181926] font-pixel text-xs sm:text-sm font-bold flex items-center gap-2">
-              <Map className="w-4 h-4" />
-              <span>Scrolling down to {scrollPrompt}</span>
-              <span className="text-lg">↓</span>
-            </div>
-            <div className="text-4xl text-[#ec3750] font-black -mt-1 select-none">
-              ▼
-            </div>
-          </div>
-        )}
 
       </div>
 

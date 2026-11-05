@@ -142,7 +142,7 @@ export default function FortuneFaq() {
             Ask in #fortune-help
           </a>
           <a
-            href="https://hackclub.slack.com/messages/fortune"
+            href="https://app.slack.com/client/E09V59WQY1E/C0CBJ54GYMQ"
             target="_blank"
             rel="noopener noreferrer"
             className="fortune-btn text-xs"

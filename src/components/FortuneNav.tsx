@@ -20,8 +20,8 @@ export default function FortuneNav() {
   const pathname = usePathname();
   const isAdmin = isUserAdmin(session?.user);
 
-  // When logged in on homepage, hide top navbar to let retro computer fill the entire screen
-  if (session?.user && pathname === "/") {
+  // On homepage (both landing page and logged-in fullscreen PC), hide top navbar
+  if (pathname === "/") {
     return null;
   }
 

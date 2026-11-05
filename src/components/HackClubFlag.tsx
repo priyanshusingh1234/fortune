@@ -8,8 +8,8 @@ export default function HackClubFlag() {
   const { data: session } = useSession();
   const pathname = usePathname();
 
-  // Hide flag on homepage when user is logged in to give the retro CRT computer the whole screen
-  if (session?.user && pathname === "/") {
+  // Hide flag on homepage (the animated airplane with Hack Club banner takes its place on landing page, and CRT PC takes whole screen when logged in)
+  if (pathname === "/") {
     return null;
   }
 

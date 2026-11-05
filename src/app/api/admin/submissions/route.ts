@@ -47,7 +47,7 @@ export async function GET(request: Request) {
     const auth = await verifyAdminAuth(request);
     if (!auth.authorized) {
       return NextResponse.json(
-        { error: "Access Denied: Only authorized admin (Slack ID U0BTDMCJ6P7) can view submissions.", submissions: [] },
+        { error: "Access Denied: Only authorized admins can view submissions.", submissions: [] },
         { status: 403 }
       );
     }
@@ -127,7 +127,7 @@ export async function PATCH(request: Request) {
     const auth = await verifyAdminAuth(request);
     if (!auth.authorized) {
       return NextResponse.json(
-        { error: "Access Denied: Only authorized admin (Slack ID U0BTDMCJ6P7) can update submissions." },
+        { error: "Access Denied: Only authorized admins can update submissions." },
         { status: 403 }
       );
     }

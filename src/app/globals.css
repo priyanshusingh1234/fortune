@@ -181,78 +181,208 @@ input[type="radio"] {
   animation: crt-glow 2.5s infinite ease-in-out;
 }
 
-/* 3D Bulged-Out CRT Workstation Chassis (Post-Login & Fullscreen Mode) */
-.crt-bulge-stage {
-  perspective: 1600px;
+/* =========================================================
+   AUTHENTIC 3D BULGED CRT MONITOR WORKSTATION (POST-LOGIN)
+   ========================================================= */
+
+/* 3D Perspective Stage */
+.crt-3d-stage {
+  perspective: 1400px;
   perspective-origin: 50% 45%;
 }
 
-.crt-bulge-chassis {
+/* Molded 3D Monitor Chassis */
+.crt-3d-monitor-chassis {
   transform-style: preserve-3d;
-  transform: perspective(1600px) rotateX(1.2deg);
+  transform: perspective(1400px) rotateX(1.2deg);
   background: #e8dec0;
-  border-top: 5px solid #f6f0df;
-  border-left: 5px solid #ede4d1;
-  border-right: 5px solid #cfc4a9;
-  border-bottom: 9px solid #b3a689;
+  border-top: 5px solid #f7f2e2;
+  border-left: 5px solid #ede5d2;
+  border-right: 5px solid #cfc3a7;
+  border-bottom: 8px solid #b3a587;
   box-shadow: 
-    0 4px 0 #b3a689,
-    0 8px 0 #9c9075,
-    0 14px 0 #7e735b,
-    0 22px 45px rgba(0, 0, 0, 0.75),
+    0 4px 0 #b3a587,
+    0 8px 0 #9c8e71,
+    0 14px 28px rgba(0, 0, 0, 0.75),
     inset 0 2px 4px rgba(255, 255, 255, 0.6);
   border-radius: 26px;
   position: relative;
   transition: transform 0.4s ease, box-shadow 0.4s ease;
 }
 
-/* Dark recessed molded bezel gasket surrounding the glass */
-.crt-bulge-bezel {
-  background: #181924;
-  border: 8px solid #2b251a;
-  border-radius: 24px;
+/* Dark Recessed Molded Bezel Gasket */
+.crt-3d-bezel {
+  background: #151622;
+  border: 7px solid #282a3a;
+  border-radius: 22px;
   box-shadow: 
-    inset 0 6px 16px rgba(0, 0, 0, 0.95),
-    inset 0 -2px 6px rgba(255, 255, 255, 0.08),
+    inset 0 5px 14px rgba(0, 0, 0, 0.95),
+    inset 0 -2px 5px rgba(255, 255, 255, 0.08),
     0 2px 4px rgba(0, 0, 0, 0.4);
   position: relative;
   overflow: hidden;
 }
 
-/* Bulged-out curved CRT screen glass surface with spherical barrel glare */
-.crt-bulge-glass {
-  border-radius: 18px;
+/* Bulged Curved CRT Screen Glass Surface */
+.crt-3d-glass {
+  border-radius: 16px;
   position: relative;
   overflow: hidden;
   box-shadow: 
-    inset 0 0 70px rgba(0, 0, 0, 0.85),
-    inset 0 0 25px rgba(0, 0, 0, 0.95),
+    inset 0 0 55px rgba(0, 0, 0, 0.8),
+    inset 0 0 18px rgba(0, 0, 0, 0.95),
     inset 0 2px 5px rgba(255, 255, 255, 0.15);
 }
 
-/* Authentic spherical glass bulge specular glare reflection */
-.crt-bulge-glass::before {
+/* Spherical Glass Bulge Reflection Glare */
+.crt-3d-glass::before {
   content: " ";
   position: absolute;
   inset: 0;
   pointer-events: none;
   z-index: 38;
   background: 
-    radial-gradient(ellipse 110% 65% at 50% 10%, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.03) 40%, rgba(0, 0, 0, 0) 70%),
-    radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0) 65%, rgba(0, 0, 0, 0.3) 85%, rgba(0, 0, 0, 0.7) 100%),
-    linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%);
+    radial-gradient(ellipse 110% 65% at 50% 10%, rgba(255, 255, 255, 0.11) 0%, rgba(255, 255, 255, 0.02) 40%, rgba(0, 0, 0, 0) 70%),
+    radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0) 65%, rgba(0, 0, 0, 0.25) 85%, rgba(0, 0, 0, 0.6) 100%),
+    linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.18) 50%);
   background-size: 100% 100%, 100% 100%, 100% 3px;
   border-radius: inherit;
 }
 
-/* Heavy CRT corner vignette for spherical bulge illusion */
-.crt-bulge-vignette {
+/* CRT Corner Vignette for Spherical Bulge Illusion */
+.crt-3d-vignette {
   position: absolute;
   inset: 0;
   pointer-events: none;
   z-index: 39;
   border-radius: inherit;
   box-shadow: 
-    inset 0 0 60px rgba(0, 0, 0, 0.65),
-    inset 0 0 25px rgba(0, 0, 0, 0.85);
+    inset 0 0 45px rgba(0, 0, 0, 0.55),
+    inset 0 0 18px rgba(0, 0, 0, 0.75);
 }
+
+/* =========================================================
+   UNIQUE ANIMATED LANDING PAGE (Fortune Sunset & Flying Cookie)
+   ========================================================= */
+
+/* Warm Fortune Sunset to Golden Amber Sky */
+.fortune-sunset-gradient {
+  background: linear-gradient(180deg, #181534 0%, #291244 24%, #6b1850 50%, #b8372b 75%, #f59e0b 100%);
+}
+
+/* 3D Extruded Golden Block Shadow for Main Title (Hard-edged 0px blur) */
+.fortune-3d-gold-title {
+  color: #ffffff;
+  text-shadow:
+    0 2px 0 #fbbf24,
+    0 4px 0 #f59e0b,
+    0 6px 0 #d97706,
+    0 8px 0 #b45309,
+    0 10px 0 #92400e,
+    0 12px 0 #78350f,
+    0 14px 0 #451a03,
+    0 16px 0 #181926;
+}
+
+/* Flying Cookie Flight Bobbing */
+@keyframes cookie-bob {
+  0%, 100% {
+    transform: translateY(0px) rotate(-1.5deg);
+  }
+  50% {
+    transform: translateY(-9px) rotate(2deg);
+  }
+}
+
+.cookie-float {
+  animation: cookie-bob 4s ease-in-out infinite;
+}
+
+/* Fluttering Pixie Wings */
+@keyframes wing-flap-left {
+  0%, 100% {
+    transform: scaleY(1) rotate(0deg);
+  }
+  50% {
+    transform: scaleY(0.4) rotate(-22deg);
+  }
+}
+
+@keyframes wing-flap-right {
+  0%, 100% {
+    transform: scaleY(1) rotate(0deg);
+  }
+  50% {
+    transform: scaleY(0.4) rotate(22deg);
+  }
+}
+
+.fortune-wing-left {
+  animation: wing-flap-left 0.7s ease-in-out infinite;
+}
+
+.fortune-wing-right {
+  animation: wing-flap-right 0.7s ease-in-out infinite;
+}
+
+/* Fortune Paper Streamer Fluttering in Wind */
+@keyframes streamer-wave {
+  0%, 100% {
+    transform: rotate(0deg) skewY(0deg);
+  }
+  25% {
+    transform: rotate(-1.5deg) skewY(2deg);
+  }
+  75% {
+    transform: rotate(1.5deg) skewY(-2deg);
+  }
+}
+
+.fortune-streamer-flutter {
+  animation: streamer-wave 2.8s ease-in-out infinite;
+}
+
+/* Floating Golden Arcade Coins */
+@keyframes coin-float-1 {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-14px) rotate(8deg);
+  }
+}
+
+@keyframes coin-float-2 {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(12px) rotate(-10deg);
+  }
+}
+
+.coin-float-1 {
+  animation: coin-float-1 5s ease-in-out infinite;
+}
+
+.coin-float-2 {
+  animation: coin-float-2 6.5s ease-in-out infinite;
+}
+
+/* Twinkling Stardust Stars */
+@keyframes star-twinkle {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+.twinkle-star {
+  animation: star-twinkle 3s ease-in-out infinite;
+}
+
+

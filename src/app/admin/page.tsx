@@ -115,9 +115,9 @@ export default function AdminDashboardPage() {
     isSubmitting: false,
   });
 
-  // Check if session user is automatically recognized as authorized admin (Slack ID: U0BTDMCJ6P7)
+  // Check if session user is automatically recognized as authorized admin
   const isAuthorizedAdmin = isUserAdmin(session?.user);
-  const userSlackId = ((session?.user as any)?.slack_id || (session?.user as any)?.id || "U0BTDMCJ6P7").toString().trim();
+  const userSlackId = ((session?.user as any)?.slack_id || (session?.user as any)?.id || "").toString().trim();
   const reviewerTag = session?.user?.name
     ? `${session.user.name} (${userSlackId})`
     : `Admin (${userSlackId})`;
@@ -379,7 +379,7 @@ export default function AdminDashboardPage() {
           </div>
           <h1 className="text-2xl font-black font-sans">Fortune Organizer Terminal</h1>
           <p className="font-doodle text-sm text-[#4a4e66]">
-            This terminal is restricted to authorized Hack Club Fortune administrators (Slack ID: <strong>U0BTDMCJ6P7</strong>). Please sign in with your Slack account.
+            This terminal is restricted to authorized Hack Club Fortune administrators ({ADMIN_SLACK_IDS.join(", ")}). Please sign in with your Slack account.
           </p>
 
           <div className="pt-2">
@@ -447,7 +447,7 @@ export default function AdminDashboardPage() {
           </p>
           <div className="bg-[#fee2e2] text-[#991b1b] border-2 border-[#ec3750] p-3 rounded font-pixel text-xs text-left flex items-start gap-2">
             <Lock className="w-4 h-4 shrink-0 text-[#ec3750] mt-0.5" />
-            <span>Only authorized organizer accounts (Slack ID: <strong>U0BTDMCJ6P7</strong>) have permissions to access the Fortune Review Terminal.</span>
+            <span>Only authorized organizer accounts ({ADMIN_SLACK_IDS.join(", ")}) have permissions to access the Fortune Review Terminal.</span>
           </div>
 
           <div className="pt-2 border-t border-[#181926]/10 text-left space-y-2">

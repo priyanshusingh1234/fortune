@@ -51,7 +51,7 @@ export default function FortuneHero() {
 
         <div className="flex items-center gap-2 font-pixel text-xs">
           <a
-            href="https://hackclub.slack.com/messages/fortune"
+            href="https://app.slack.com/client/E09V59WQY1E/C0CBJ54GYMQ"
             target="_blank"
             rel="noopener noreferrer"
             className="bg-white text-[#181926] px-3 py-1.5 rounded-md border-2 border-[#181926] shadow-[2px_2px_0px_#181926] hover:bg-[#ffe066]"
@@ -144,7 +144,7 @@ export default function FortuneHero() {
             </a>
 
             <a
-              href="https://hackclub.slack.com/messages/fortune"
+              href="https://app.slack.com/client/E09V59WQY1E/C0CBJ54GYMQ"
               target="_blank"
               rel="noopener noreferrer"
               className="font-doodle text-lg font-bold text-[#ec3750] hover:underline rotate-[-1deg] inline-flex items-center gap-1"

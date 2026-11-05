@@ -77,7 +77,7 @@ export default function FortuneFooter() {
           </div>
           <ul className="space-y-1 text-xs font-pixel">
             <li>
-              <a href="https://hackclub.slack.com/messages/fortune" target="_blank" rel="noopener noreferrer" className="hover:text-[#ec3750] hover:underline text-[#1e5aa0]">
+              <a href="https://app.slack.com/client/E09V59WQY1E/C0CBJ54GYMQ" target="_blank" rel="noopener noreferrer" className="hover:text-[#ec3750] hover:underline text-[#1e5aa0]">
                 #fortune (Slack)
               </a>
             </li>
